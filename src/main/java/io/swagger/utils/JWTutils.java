@@ -34,15 +34,10 @@ public class JWTutils {
      * @param token
      * @return
      */
-    public static String getIdAsString(String token)
+    public static long parseToken(String token) throws JWTDecodeException
     {
-        String id = null;
-        try {
-            JWT jwt = JWT.decode(token);
-            id = jwt.getClaim("id").asString();
-        } catch (JWTDecodeException exception){ //Invalid token
-            return null;
-        }
-        return id;
+        JWT jwt = JWT.decode(token);
+        String id = jwt.getClaim("id").asString();
+        return Long.parseLong(id);
     }
 }
