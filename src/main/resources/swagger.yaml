@@ -1,0 +1,372 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "Alpha 1.0"
+  title: <Monopolly>
+
+host: localhost:8080
+schemes:
+  - http
+
+# Describe your paths here
+paths:
+  # This is a path endpoint. Change it.
+  /auth:
+    # This is a HTTP operation
+    post:
+      # Describe this verb here. Note: you can use markdown
+      summary: Authenticate
+      description: |
+        Authenticate a user
+      # This is array of GET operation parameters:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        # An example parameter that is in query and is required
+        -
+          name: user
+          in: body
+          description: user to be connected
+          required: true
+          schema:
+            $ref: '#/definitions/user'
+
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Authentication sucessfull.
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            $ref: '#/definitions/token'
+        400:
+          description: Bad request.
+        401:
+          description: Bad credentials.
+
+  /user:
+    post:
+      summary: new user
+      description: |
+        Creates a new user
+      consumes:
+        - application/json
+      parameters:
+        -
+          name: user
+          in: body
+          description: user to be created
+          required: true
+          schema:
+            $ref: '#/definitions/user'
+
+      responses:
+        201:
+          description: Sucessfully created.
+        400:
+          description: Bad request.
+        409:
+          description: Already exists.
+
+    delete:
+      summary: delete user
+      description: |
+        Let a user delete himself
+      parameters:
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+
+      responses:
+        204:
+          description: user deleted successfully.
+        400:
+          description: invalid token or credentials.
+        403:
+          description: only you can delete yourself.
+
+  /user/polls:
+    get:
+      summary: Gets your polls
+      description: retrives a list of your polls.
+      produces:
+        - application/json
+      parameters:
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/completePoll'
+        400:
+          description: Bad request.
+        403:
+          description: Forbidden.
+
+
+
+  /polls:
+    post:
+      summary: New poll
+      description: |
+        Creates a new poll
+      consumes:
+        - application/json
+      parameters:
+        - name: poll
+          in: body
+          description: poll to be created
+          required: true
+          schema:
+            $ref: '#/definitions/poll'
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+
+      responses:
+        201:
+          description: Sucessfully created. - Returns the id of the created poll
+          schema:
+            type: integer
+            format: int64
+        400:
+          description: Bad request.
+        403:
+          description: Forbidden.
+        409:
+          description: A poll with this name already exists.
+
+  /polls/{p_id}:
+
+    post:
+      summary: add a question
+      description: adds a question to your poll
+      consumes:
+        - application/json
+      parameters:
+        - name: p_id
+          in: path
+          description: poll to be modified
+          required: true
+          type: integer
+          format: int64
+        - name: poll
+          in: body
+          description: poll to be patched
+          required: true
+          schema:
+            $ref: '#/definitions/question'
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+
+      responses:
+        200:
+          description: OK - returns the id of the created question
+          schema:
+            type: integer
+            format: int64
+
+
+    get:
+      summary: Gets a poll
+      description: |
+        Returns the selected poll. This endpoint can be used without an authentification.
+      produces:
+        - application/json
+      parameters:
+        - name: p_id
+          in: path
+          description: poll to be retrived
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: the requested poll
+          schema:
+            $ref: '#/definitions/completePoll'
+        403:
+          description: Forbidden.
+        404:
+          description: Not found.
+
+    delete:
+      summary: deletes poll.
+      description: deletes this poll only if you owns it.
+      parameters:
+        - name: p_id
+          in: path
+          description: poll to be retrived
+          required: true
+          type: integer
+          format: int64
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        204:
+          description: OK
+        401:
+          description: Unauthorized.
+        403:
+          description: Forbidden.
+        404:
+          description: Not found.
+
+
+  /polls/{p_id}/{q_id}:
+
+    patch:
+      summary: patch this question
+      description: Update a question in your poll. If users are using it, they will be notified instantly via websocket.
+      consumes:
+        - application/json
+      parameters:
+        - name: p_id
+          in: path
+          description: poll to be patched
+          required: true
+          type: integer
+          format: int64
+        - name: q_id
+          in: path
+          description: poll to be retrived
+          required: true
+          type: integer
+          format: int64
+        - name: poll
+          in: body
+          description: poll to be patched
+          required: true
+          schema:
+            $ref: '#/definitions/completePoll'
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK.
+        401:
+          description: Unauthorized.
+        403:
+          description: Forbidden.
+        404:
+          description: Not found.
+    delete:
+      summary: deletes a question
+      description: deletes a question of this poll
+      parameters:
+        - name: p_id
+          in: path
+          description: poll to be patched
+          required: true
+          type: integer
+          format: int64
+        - name: q_id
+          in: path
+          description: poll to be retrived
+          required: true
+          type: integer
+          format: int64
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+
+
+definitions:
+  user:
+    type: object
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+  token:
+    type: object
+    required:
+      - token
+    properties:
+      token:
+        type: string
+  poll:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+
+  completePoll:
+    type: object
+    required:
+      - id
+      - name
+      - questions
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      questions:
+        type: array
+        items:
+          $ref: '#/definitions/completeQuestion'
+
+  question:
+    type: object
+    required:
+      - body
+      - isAnwser
+    properties:
+      body:
+        type: string
+      isAnwser:
+        type: boolean
+
+  completeQuestion:
+    type: object
+    required:
+      - id
+      - body
+      - isSelected
+    properties:
+      id:
+        type: integer
+        format: int64
+      body:
+        type: string
+      isSelected:
+        type: boolean
