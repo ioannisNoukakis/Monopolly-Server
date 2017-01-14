@@ -1,6 +1,7 @@
 package io.swagger.database.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by lux on 10.12.16.
@@ -15,6 +16,9 @@ public class User {
     @Column(unique=true)
     private String username;
     private String password;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CompleteRoom> rooms;
 
     public User(){
 
