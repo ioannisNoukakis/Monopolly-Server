@@ -11,6 +11,7 @@ import io.swagger.database.dao.RoomRepository;
 import io.swagger.database.dao.UserRepository;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.CompleteQuestion;
+import io.swagger.utils.Converter;
 import io.swagger.utils.JWTutils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -102,60 +103,10 @@ public class UserApiController implements UserApi {
             tmp.setId(completeRoom.getId());
             tmp.setOwner(completeRoom.getOwner().getId());
             tmp.setName(completeRoom.getName());
-            tmp.setPolls(pollsFromModelToDTO(completeRoom));
+            tmp.setPolls(Converter.pollsFromModelToDTO(completeRoom));
             completeRooms.push(tmp);
         }
 
         return new ResponseEntity<>((List<CompleteRoom>)completeRooms, HttpStatus.OK);
-    }
-
-    private List<CompletePoll> pollsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom)
-    {
-        LinkedList<CompletePoll> completePolls = new LinkedList<>();
-        for(io.swagger.database.model.CompletePoll completePoll : completeRoom.getPolls())
-        {
-            CompletePoll tmp = new CompletePoll();
-            tmp.setId(completePoll.getId());
-            tmp.setName(completePoll.getName());
-            tmp.setQuestions(questionsFromModelToDTO(completePoll));
-            completePolls.push(tmp);
-        }
-        return completePolls;
-    }
-
-    private List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompletePoll completePoll)
-    {
-        LinkedList<com.cristallium.api.dto.CompleteQuestion> completeQuestions = new LinkedList<>();
-        for(CompleteQuestion completeQuestion: completePoll.getQuestions())
-        {
-            com.cristallium.api.dto.CompleteQuestion tmp = new com.cristallium.api.dto.CompleteQuestion();
-            tmp.setId(completeQuestion.getId());
-            tmp.setBody(completeQuestion.getBody());
-            tmp.setAnswers(answersFromModelToDTO(completeQuestion, false));
-            completeQuestions.push(tmp);
-        }
-        return completeQuestions;
-    }
-
-    /**
-     * CAUTION! This method return the correct answer of the question. Use the parameter to true to disable that
-     * @param completeQuestion
-     * @return
-     */
-    private List<CompleteAsnwer> answersFromModelToDTO(CompleteQuestion completeQuestion, boolean hideAnswers)
-    {
-        LinkedList<CompleteAsnwer> completeAsnwers = new LinkedList<>();
-        for(CompleteAnswer completeAnswer : completeQuestion.getAnswers())
-        {
-            CompleteAsnwer tmp = new CompleteAsnwer();
-            tmp.setId(completeAnswer.getId());
-            tmp.setBody(tmp.getBody());
-            if(hideAnswers)
-                tmp.setIsValid(false);
-            else
-                tmp.setIsValid(tmp.getIsValid());
-            completeAsnwers.push(tmp);
-        }
-        return completeAsnwers;
     }
 }

@@ -146,12 +146,12 @@ paths:
         403:
           description: Forbidden.
 
-  /rooms/{room_id}:
+  /rooms/{roomId}:
     patch:
       summary: Patches this room.
       description: Patches this room.
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: room to be modified
           required: true
@@ -182,7 +182,7 @@ paths:
       summary: Deletes this room.
       description: Deletes this room.
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: room to be deleted
           required: true
@@ -207,24 +207,20 @@ paths:
       summary: Gets this room.
       description: Gets this room. Rooms are visible by all.
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: room to be get
           required: true
           type: integer
           format: int64
-        - name: token
-          in: header
-          description: token to be passed as a header
-          required: true
-          type: string
       responses:
         200:
           description: OK
+          schema:
+            $ref: '#/definitions/completeRoom'
         404:
           description: not found.
 
-  /rooms/{room_id}/polls:
     post:
       summary: New poll
       description: |
@@ -232,7 +228,7 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: the room
           required: true
@@ -257,7 +253,7 @@ paths:
         403:
           description: Forbidden.
 
-  /rooms/{room_id}/polls/{p_id}:
+  /rooms/{roomId}/polls/{pId}:
     get:
       summary: Gets a poll
       description: |
@@ -265,13 +261,13 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: the room
           required: true
           type: integer
           format: int64
-        - name: p_id
+        - name: pId
           in: path
           description: poll to be retrived
           required: true
@@ -282,24 +278,59 @@ paths:
           description: the requested poll
           schema:
             $ref: '#/definitions/completePoll'
+        404:
+          description: Not found.
+
+    patch:
+      summary: patches poll.
+      description: patches this poll only if you owns it.
+      parameters:
+        - name: roomId
+          in: path
+          description: the room
+          required: true
+          type: integer
+          format: int64
+        - name: pId
+          in: path
+          description: the poll
+          required: true
+          type: integer
+          format: int64
+        - name: poll
+          in: body
+          description: the poll
+          required: true
+          schema:
+            $ref: '#/definitions/poll'
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        204:
+          description: OK
+        401:
+          description: Unauthorized.
         403:
           description: Forbidden.
         404:
           description: Not found.
 
     delete:
-      summary: deletes poll.
+      summary: deletes this poll.
       description: deletes this poll only if you owns it.
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: the room
           required: true
           type: integer
           format: int64
-        - name: p_id
+        - name: pId
           in: path
-          description: poll to be retrived
+          description: the poll
           required: true
           type: integer
           format: int64
@@ -324,21 +355,21 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: the room
           required: true
           type: integer
           format: int64
-        - name: p_id
+        - name: pId
           in: path
-          description: poll to be modified
+          description: the poll
           required: true
           type: integer
           format: int64
-        - name: poll
+        - name: question
           in: body
-          description: poll to be patched
+          description: Question to be added
           required: true
           schema:
             $ref: '#/definitions/question'
@@ -357,37 +388,37 @@ paths:
           description: You don't have a token.
 
 
-  /rooms/{room_id}/polls/{p_id}/question/{q_id}:
+  /rooms/{roomId}/polls/{pId}/question/{qId}:
     patch:
       summary: patch this question
       description: Update a question in your poll. If users are using it, they will be notified instantly via websocket.
       consumes:
         - application/json
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: the room
           required: true
           type: integer
           format: int64
-        - name: p_id
+        - name: pId
           in: path
-          description: poll to be patched
+          description: the poll
           required: true
           type: integer
           format: int64
-        - name: q_id
+        - name: qId
           in: path
-          description: poll to be retrived
+          description: the question
           required: true
           type: integer
           format: int64
-        - name: poll
+        - name: question
           in: body
-          description: poll to be patched
+          description: question to be patched
           required: true
           schema:
-            $ref: '#/definitions/completePoll'
+            $ref: '#/definitions/completeQuestion'
         - name: token
           in: header
           description: token to be passed as a header
@@ -407,19 +438,19 @@ paths:
       summary: deletes a question
       description: deletes a question of this poll
       parameters:
-        - name: room_id
+        - name: roomId
           in: path
           description: the room
           required: true
           type: integer
           format: int64
-        - name: p_id
+        - name: pId
           in: path
           description: poll to be patched
           required: true
           type: integer
           format: int64
-        - name: q_id
+        - name: qId
           in: path
           description: poll to be retrived
           required: true
@@ -516,6 +547,10 @@ definitions:
     properties:
       body:
         type: string
+      answers:
+        type: array
+        items:
+          $ref: '#/definitions/asnwer'
 
   completeQuestion:
     type: object
