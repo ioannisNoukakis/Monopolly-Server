@@ -21,9 +21,10 @@ public class CompleteAnswer {
     public CompleteAnswer() {
     }
 
-    public CompleteAnswer(String body, boolean isValid) {
+    public CompleteAnswer(String body, boolean isValid, CompleteQuestion completeQuestion) {
         this.body = body;
         this.isValid = isValid;
+        this.completeQuestion = completeQuestion;
     }
 
     public void setId(long id) {
@@ -48,5 +49,13 @@ public class CompleteAnswer {
 
     public boolean isValid() {
         return isValid;
+    }
+
+    public CompleteQuestion getCompleteQuestion() {
+        return completeQuestion;
+    }
+
+    public void setCompleteQuestion(CompleteQuestion completeQuestion) {
+        this.completeQuestion = completeQuestion;
     }
 }

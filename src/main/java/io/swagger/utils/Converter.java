@@ -56,11 +56,11 @@ public class Converter {
         {
             CompleteAsnwer tmp = new CompleteAsnwer();
             tmp.setId(completeAnswer.getId());
-            tmp.setBody(tmp.getBody());
+            tmp.setBody(completeAnswer.getBody());
             if(hideAnswers)
                 tmp.setIsValid(false);
             else
-                tmp.setIsValid(tmp.getIsValid());
+                tmp.setIsValid(completeAnswer.isValid());
             completeAsnwers.push(tmp);
         }
         return completeAsnwers;

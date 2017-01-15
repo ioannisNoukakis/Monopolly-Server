@@ -291,6 +291,11 @@ public class RoomsApiController implements RoomsApi {
         if(question == null || question.getBody() == null || question.getBody().isEmpty() || question.getAnswers() == null || question.getAnswers().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+        io.swagger.database.model.CompleteQuestion completeQuestion = new io.swagger.database.model.CompleteQuestion(question.getBody(), completePoll, new LinkedList<CompleteAnswer>());
+        questionReporitory.save(completeQuestion);
+        completePoll.getQuestions().add(completeQuestion);
+        pollRepository.save(completePoll);
+
         LinkedList<CompleteAnswer> completeAnswers = new LinkedList<>();
 
         for(Asnwer asnwer : question.getAnswers())
@@ -299,14 +304,12 @@ public class RoomsApiController implements RoomsApi {
             CompleteAnswer tmp = new CompleteAnswer();
             tmp.setBody(asnwer.getBody());
             tmp.setValid(asnwer.getIsValid());
+            tmp.setCompleteQuestion(completeQuestion);
             answerRepository.save(tmp);
             completeAnswers.push(tmp);
         }
-
-        io.swagger.database.model.CompleteQuestion completeQuestion = new io.swagger.database.model.CompleteQuestion(question.getBody(), completePoll, completeAnswers);
+        completeQuestion.setAnswers(completeAnswers);
         questionReporitory.save(completeQuestion);
-        completePoll.getQuestions().add(completeQuestion);
-        pollRepository.save(completePoll);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
