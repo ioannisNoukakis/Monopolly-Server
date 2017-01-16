@@ -288,7 +288,7 @@ public class RoomsApiController implements RoomsApi {
         if(question == null || question.getBody() == null || question.getBody().isEmpty() || question.getAnswers() == null || question.getAnswers().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        io.swagger.database.model.CompleteQuestion completeQuestion = new io.swagger.database.model.CompleteQuestion(question.getBody(), completePoll, new LinkedList<CompleteAnswer>());
+        io.swagger.database.model.CompleteQuestion completeQuestion = new io.swagger.database.model.CompleteQuestion(question.getBody(), false, completePoll, new LinkedList<CompleteAnswer>());
         questionReporitory.save(completeQuestion);
         completePoll.getQuestions().add(completeQuestion);
         pollRepository.save(completePoll);
@@ -343,6 +343,9 @@ public class RoomsApiController implements RoomsApi {
 
         if(question == null || question.getBody() == null || question.getBody().isEmpty() || question.getAnswers() == null || question.getAnswers().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        completeQuestion.setBody(question.getBody());
+        completeQuestion.setClosed(question.getClosed());
 
         completeQuestion.setAnswers(new LinkedList<CompleteAnswer>());
 

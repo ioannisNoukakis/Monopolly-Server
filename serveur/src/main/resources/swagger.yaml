@@ -424,6 +424,38 @@ paths:
         200:
           description: OK
 
+  /answer:
+    post:
+      summary: Posts an answer .
+      description: Posts an answer for a question. If this question is closed then it is not possible any longer.
+      parameters:
+        - name: answer
+          in: body
+          description: The answer to be submitted.
+          required: true
+          schema:
+            $ref: '#/definitions/CompleteAsnwer'
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK. Returns the question with the correct answer.
+          schema:
+            $ref: '#/definitions/completeQuestion'
+        400:
+          description: Invalid answer object.
+        403:
+          description: You don't have a token.
+        404:
+          description: Question not found.
+        409:
+          description: You already have submitted an answer.
+
+
+
 
 definitions:
   user:
@@ -517,6 +549,7 @@ definitions:
       - id
       - body
       - answers
+      - closed
     properties:
       id:
         type: integer
@@ -527,6 +560,8 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/CompleteAsnwer'
+      closed:
+        type: boolean
 
   asnwer:
     type: object

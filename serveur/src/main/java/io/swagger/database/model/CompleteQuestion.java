@@ -14,6 +14,8 @@ public class CompleteQuestion {
 
     private String body;
 
+    private boolean closed;
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="COMPLETE_POLL_ID")
     private CompletePoll completePoll;
@@ -21,8 +23,9 @@ public class CompleteQuestion {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CompleteAnswer> answers;
 
-    public CompleteQuestion(String body, CompletePoll completePoll, List<CompleteAnswer> answers) {
+    public CompleteQuestion(String body, boolean closed, CompletePoll completePoll, List<CompleteAnswer> answers) {
         this.body = body;
+        this.closed = closed;
         this.completePoll = completePoll;
         this.answers = answers;
     }
@@ -61,5 +64,13 @@ public class CompleteQuestion {
 
     public void setCompletePoll(CompletePoll completePoll) {
         this.completePoll = completePoll;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

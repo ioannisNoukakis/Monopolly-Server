@@ -78,7 +78,7 @@ public class UserApiController implements UserApi {
         if(user == null || user.getUsername() == null || user.getPassword() == null || user.getUsername().isEmpty() || user.getPassword().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            userRepository.save(new io.swagger.database.model.User(user.getUsername(), user.getPassword()));
+            userRepository.save(new io.swagger.database.model.User(user.getUsername(), user.getPassword(), new LinkedList<io.swagger.database.model.CompleteRoom>(), new LinkedList<CompleteAnswer>()));
         }catch (DataIntegrityViolationException e)
         {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
