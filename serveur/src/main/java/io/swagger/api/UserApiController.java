@@ -75,7 +75,7 @@ public class UserApiController implements UserApi {
      */
     @Override
     public ResponseEntity<Void> userPost(@ApiParam(value = "user to be created", required = true) @RequestBody User user) {
-        if(user.getUsername().isEmpty() || user.getPassword().isEmpty())
+        if(user == null || user.getUsername() == null || user.getPassword() == null || user.getUsername().isEmpty() || user.getPassword().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
             userRepository.save(new io.swagger.database.model.User(user.getUsername(), user.getPassword()));
