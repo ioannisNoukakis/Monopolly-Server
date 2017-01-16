@@ -253,7 +253,7 @@ paths:
         403:
           description: Forbidden.
 
-  /rooms/{roomId}/polls/{pId}:
+  /rooms/polls/{pId}:
     get:
       summary: Gets a poll
       description: |
@@ -261,12 +261,6 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: roomId
-          in: path
-          description: the room
-          required: true
-          type: integer
-          format: int64
         - name: pId
           in: path
           description: poll to be retrived
@@ -285,12 +279,6 @@ paths:
       summary: patches poll.
       description: patches this poll only if you owns it.
       parameters:
-        - name: roomId
-          in: path
-          description: the room
-          required: true
-          type: integer
-          format: int64
         - name: pId
           in: path
           description: the poll
@@ -322,12 +310,6 @@ paths:
       summary: deletes this poll.
       description: deletes this poll only if you owns it.
       parameters:
-        - name: roomId
-          in: path
-          description: the room
-          required: true
-          type: integer
-          format: int64
         - name: pId
           in: path
           description: the poll
@@ -349,6 +331,7 @@ paths:
         404:
           description: Not found.
 
+  /rooms/{roomId}/polls/{pId}:
     post:
       summary: add a question
       description: adds a question to your poll
@@ -388,25 +371,13 @@ paths:
           description: You don't have a token.
 
 
-  /rooms/{roomId}/polls/{pId}/question/{qId}:
+  /rooms/polls/question/{qId}:
     patch:
       summary: patch this question
       description: Update a question in your poll. If users are using it, they will be notified instantly via websocket.
       consumes:
         - application/json
       parameters:
-        - name: roomId
-          in: path
-          description: the room
-          required: true
-          type: integer
-          format: int64
-        - name: pId
-          in: path
-          description: the poll
-          required: true
-          type: integer
-          format: int64
         - name: qId
           in: path
           description: the question
@@ -438,18 +409,6 @@ paths:
       summary: deletes a question
       description: deletes a question of this poll
       parameters:
-        - name: roomId
-          in: path
-          description: the room
-          required: true
-          type: integer
-          format: int64
-        - name: pId
-          in: path
-          description: poll to be patched
-          required: true
-          type: integer
-          format: int64
         - name: qId
           in: path
           description: poll to be retrived

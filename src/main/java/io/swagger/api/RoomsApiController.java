@@ -162,13 +162,12 @@ public class RoomsApiController implements RoomsApi {
     /**
      * Deletes a poll in a room
      *
-     * @param roomId
      * @param pId
      * @param token
      * @return
      */
     @Override
-    public ResponseEntity<Void> roomsRoomIdPollsPIdDelete(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "the poll", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsPollsPIdDelete(@ApiParam(value = "the poll", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -218,12 +217,11 @@ public class RoomsApiController implements RoomsApi {
     /**
      * Gets a poll in a room
      *
-     * @param roomId
      * @param pId
      * @return
      */
     @Override
-    public ResponseEntity<CompletePoll> roomsRoomIdPollsPIdGet(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "poll to be retrived", required = true) @PathVariable("pId") Long pId) {
+    public ResponseEntity<CompletePoll> roomsPollsPIdGet(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("pId") Long pId) {
         io.swagger.database.model.CompletePoll completePollDB = pollRepository.findOne(pId);
         if(completePollDB == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -238,14 +236,13 @@ public class RoomsApiController implements RoomsApi {
     /**
      * Patches a poll in a room
      *
-     * @param roomId
      * @param pId
      * @param poll
      * @param token
      * @return
      */
     @Override
-    public ResponseEntity<Void> roomsRoomIdPollsPIdPatch(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "poll to be retrived", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "the poll", required = true) @RequestBody Poll poll, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsPollsPIdPatch(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "the poll", required = true) @RequestBody Poll poll, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -315,7 +312,7 @@ public class RoomsApiController implements RoomsApi {
 
 
     @Override
-    public ResponseEntity<Void> roomsRoomIdPollsPIdQuestionQIdDelete(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "poll to be patched", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "poll to be retrived", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsPollsQuestionQIdDelete(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -332,7 +329,7 @@ public class RoomsApiController implements RoomsApi {
     }
 
     @Override
-    public ResponseEntity<Void> roomsRoomIdPollsPIdQuestionQIdPatch(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "the poll", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsPollsQuestionQIdPatch(@ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
