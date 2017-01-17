@@ -12,7 +12,7 @@ public class CompleteRoom {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinColumn(name="OWNER_ID")
     private User owner;
 

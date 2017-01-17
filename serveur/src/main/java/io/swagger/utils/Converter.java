@@ -1,7 +1,6 @@
 package io.swagger.utils;
 
 import com.cristallium.api.dto.CompleteAsnwer;
-import com.cristallium.api.dto.CompletePoll;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.CompleteQuestion;
 

@@ -2,15 +2,12 @@ package io.swagger.api;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.UserApi;
-import com.cristallium.api.dto.CompleteAsnwer;
-import com.cristallium.api.dto.CompletePoll;
 import com.cristallium.api.dto.CompleteRoom;
 import com.cristallium.api.dto.User;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.RoomRepository;
 import io.swagger.database.dao.UserRepository;
 import io.swagger.database.model.CompleteAnswer;
-import io.swagger.database.model.CompleteQuestion;
 import io.swagger.utils.Converter;
 import io.swagger.utils.JWTutils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +15,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

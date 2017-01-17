@@ -16,7 +16,7 @@ public class CompleteQuestion {
 
     private boolean closed;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinColumn(name="COMPLETE_POLL_ID")
     private CompleteRoom completeRoom;
 

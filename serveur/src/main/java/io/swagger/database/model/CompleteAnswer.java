@@ -17,11 +17,11 @@ public class CompleteAnswer {
     private String body;
     private boolean isValid;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinColumn(name="COMPLETE_QUESTION_ID")
     private CompleteQuestion completeQuestion;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<User> user;
 
     public CompleteAnswer() {

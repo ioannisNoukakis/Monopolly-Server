@@ -3,7 +3,6 @@ package io.swagger.api;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.RoomsApi;
 import com.cristallium.api.dto.*;
-import com.cristallium.api.dto.CompletePoll;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.*;
 import io.swagger.database.model.*;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by lux on 14.01.17.
@@ -101,6 +101,8 @@ public class RoomsApiController implements RoomsApi {
         if(completeRoomDB.getOwner().getId() != user.getId())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
+        List<CompleteQuestion> completeQuestions = completeRoomDB.getQuestions();
+        List<CompleteAnswer> completeAnswers;
         roomRepository.delete(completeRoomDB);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
