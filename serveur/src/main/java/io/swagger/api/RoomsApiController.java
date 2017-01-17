@@ -101,8 +101,20 @@ public class RoomsApiController implements RoomsApi {
         if(completeRoomDB.getOwner().getId() != user.getId())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        List<CompleteQuestion> completeQuestions = completeRoomDB.getQuestions();
-        List<CompleteAnswer> completeAnswers;
+        for(CompleteQuestion completeQuestion: completeRoomDB.getQuestions())
+        {
+            for(CompleteAnswer completeAnswer: completeQuestion.getAnswers())
+            {
+                completeAnswer.setCompleteQuestion(null);
+                completeAnswer.setUser(new LinkedList<User>());
+                answerRepository.delete(completeAnswer);
+            }
+            completeQuestion.setAnswers(new LinkedList<CompleteAnswer>());
+            completeQuestion.setCompleteRoom(null);
+            questionReporitory.delete(completeQuestion);
+        }
+        completeRoomDB.setQuestions(new LinkedList<CompleteQuestion>());
+        completeRoomDB.setOwner(null);
         roomRepository.delete(completeRoomDB);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -214,6 +226,15 @@ public class RoomsApiController implements RoomsApi {
         if(completeQuestion.getCompleteRoom().getOwner().getId() != user.getId())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
+        for(CompleteAnswer completeAnswer: completeQuestion.getAnswers())
+        {
+            completeAnswer.setCompleteQuestion(null);
+            completeAnswer.setUser(new LinkedList<User>());
+            answerRepository.delete(completeAnswer);
+        }
+        completeQuestion.setAnswers(new LinkedList<CompleteAnswer>());
+        completeQuestion.getCompleteRoom().getQuestions().remove(completeQuestion);
+        completeQuestion.setCompleteRoom(null);
         questionReporitory.delete(completeQuestion);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
