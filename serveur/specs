@@ -1,7 +1,7 @@
 -> /rooms -> GET, POST, PATCH, DELETE
--> /rooms/{id}/polls ->GET(all), POST
--> /rooms/{id}/polls/{id} -> DELETE, PATCH
--> /rooms/id/polls/id/question POST
--> /rooms/id/polls/id/question/id PATCH, DELETE
+-> /rooms/{id}/questions ->GET(all), POST
+-> /rooms/{id}/questions/{id} -> DELETE, PATCH
+-> /rooms/id/questions/id/question POST
+-> /rooms/id/questions/id/question/id PATCH, DELETE
 //answers dans les questions.
 //quand on renvoie une answer on met tout à false.

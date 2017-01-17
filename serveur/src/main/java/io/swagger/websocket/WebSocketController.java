@@ -1,8 +1,9 @@
 package io.swagger.websocket;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.cristallium.api.dto.Question;
 import io.swagger.DataWatcher.AnswerWatcher;
-import io.swagger.database.dao.PollRepository;
+import io.swagger.database.dao.QuestionReporitory;
 import io.swagger.database.dao.UserRepository;
 import io.swagger.utils.JSONParser;
 import io.swagger.utils.JWTutils;
@@ -28,7 +29,7 @@ public class WebSocketController extends TextWebSocketHandler {
     UserRepository userRepository;
 
     @Autowired
-    PollRepository pollRepository;
+    QuestionReporitory questionReporitory;
 
     public WebSocketController() {
         clients = Collections.<WebSocketSession>synchronizedList(new LinkedList<WebSocketSession>());
@@ -47,15 +48,15 @@ public class WebSocketController extends TextWebSocketHandler {
             return;
         }
 
-        if(pollRepository.findOne(subscriptionMessage.getPollId()) == null) {
+        if(questionReporitory.findOne(subscriptionMessage.getQuestionId()) == null) {
             session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(403))));
             return;
         }
 
         if(subscriptionMessage.isSubscribe())
-            doSubscribe(session, subscriptionMessage.getEndpoint(), subscriptionMessage.getPollId());
+            doSubscribe(session, subscriptionMessage.getEndpoint(), subscriptionMessage.getQuestionId());
         else
-            doUnSubscribe(session, subscriptionMessage.getEndpoint(), subscriptionMessage.getPollId());
+            doUnSubscribe(session, subscriptionMessage.getEndpoint(), subscriptionMessage.getQuestionId());
     }
 
     private boolean isClientAuth(String token)
@@ -70,11 +71,11 @@ public class WebSocketController extends TextWebSocketHandler {
        return userRepository.findOne(id) != null;
     }
 
-    private void doSubscribe(WebSocketSession session, String endpoint, Long pollid) throws IOException {
+    private void doSubscribe(WebSocketSession session, String endpoint, Long questionId) throws IOException {
         switch (endpoint)
         {
             case "answersReply":
-                AnswerWatcher.getInstance().addClient(new Subscription(session, pollid));
+                AnswerWatcher.getInstance().addClient(new Subscription(session, questionId));
                 session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
                 break;
             default:
@@ -82,11 +83,11 @@ public class WebSocketController extends TextWebSocketHandler {
         }
     }
 
-    private void doUnSubscribe(WebSocketSession session, String endpoint, Long pollid) throws IOException {
+    private void doUnSubscribe(WebSocketSession session, String endpoint, Long questionId) throws IOException {
         switch (endpoint)
         {
             case "answersReply":
-                AnswerWatcher.getInstance().removeClient(new Subscription(session, pollid));
+                AnswerWatcher.getInstance().removeClient(new Subscription(session, questionId));
                 session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
                 break;
             default:

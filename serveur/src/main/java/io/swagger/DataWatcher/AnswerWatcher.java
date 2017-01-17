@@ -2,7 +2,6 @@ package io.swagger.DataWatcher;
 
 import io.swagger.websocket.Subscription;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -46,7 +45,7 @@ public class AnswerWatcher {
             while (iterator.hasNext()) {
                 Subscription su = iterator.next();
                 try {
-                    if(su.getPoillid() == pollid) {
+                    if(su.getQuestionId() == pollid) {
                         System.out.println("[ANSWER_WATCHER] Message sent.");
                         su.getSession().sendMessage(new TextMessage(message));
                     }

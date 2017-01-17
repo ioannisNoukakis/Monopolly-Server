@@ -18,15 +18,15 @@ public class CompleteQuestion {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="COMPLETE_POLL_ID")
-    private CompletePoll completePoll;
+    private CompleteRoom completeRoom;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CompleteAnswer> answers;
 
-    public CompleteQuestion(String body, boolean closed, CompletePoll completePoll, List<CompleteAnswer> answers) {
+    public CompleteQuestion(String body, boolean closed, CompleteRoom completeRoom, List<CompleteAnswer> answers) {
         this.body = body;
         this.closed = closed;
-        this.completePoll = completePoll;
+        this.completeRoom = completeRoom;
         this.answers = answers;
     }
 
@@ -58,12 +58,12 @@ public class CompleteQuestion {
         this.answers = answers;
     }
 
-    public CompletePoll getCompletePoll() {
-        return completePoll;
+    public CompleteRoom getCompleteRoom() {
+        return completeRoom;
     }
 
-    public void setCompletePoll(CompletePoll completePoll) {
-        this.completePoll = completePoll;
+    public void setCompleteRoom(CompleteRoom completeRoom) {
+        this.completeRoom = completeRoom;
     }
 
     public boolean isClosed() {

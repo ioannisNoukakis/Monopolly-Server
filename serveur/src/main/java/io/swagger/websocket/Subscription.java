@@ -7,11 +7,11 @@ import org.springframework.web.socket.WebSocketSession;
  */
 public class Subscription {
     private WebSocketSession session;
-    private Long poillid;
+    private Long questionId;
 
-    public Subscription(WebSocketSession session, Long poillid) {
+    public Subscription(WebSocketSession session, Long questionId) {
         this.session = session;
-        this.poillid = poillid;
+        this.questionId = questionId;
     }
 
     public WebSocketSession getSession() {
@@ -22,11 +22,11 @@ public class Subscription {
         this.session = session;
     }
 
-    public Long getPoillid() {
-        return poillid;
+    public Long getQuestionId() {
+        return questionId;
     }
 
-    public void setPoillid(Long poillid) {
-        this.poillid = poillid;
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 }

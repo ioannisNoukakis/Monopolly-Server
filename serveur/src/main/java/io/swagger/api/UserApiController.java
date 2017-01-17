@@ -103,7 +103,7 @@ public class UserApiController implements UserApi {
             tmp.setId(completeRoom.getId());
             tmp.setOwner(completeRoom.getOwner().getId());
             tmp.setName(completeRoom.getName());
-            tmp.setPolls(Converter.pollsFromModelToDTO(completeRoom, false));
+            tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoom, false));
             completeRooms.push(tmp);
         }
 

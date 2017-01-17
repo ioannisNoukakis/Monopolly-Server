@@ -4,15 +4,15 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.RoomsApi;
 import com.cristallium.api.dto.*;
 import com.cristallium.api.dto.CompletePoll;
-import com.cristallium.api.dto.CompleteQuestion;
-import com.cristallium.api.dto.CompleteRoom;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.*;
 import io.swagger.database.model.*;
+import io.swagger.database.model.CompleteQuestion;
 import io.swagger.database.model.User;
 import io.swagger.utils.Converter;
 import io.swagger.utils.JWTutils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,9 +31,6 @@ public class RoomsApiController implements RoomsApi {
 
     @Autowired
     RoomRepository roomRepository;
-
-    @Autowired
-    PollRepository pollRepository;
 
     @Autowired
     QuestionReporitory questionReporitory;
@@ -74,7 +71,12 @@ public class RoomsApiController implements RoomsApi {
         if(room == null || room.getName() == null || room.getName().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        roomRepository.save(new io.swagger.database.model.CompleteRoom(user, room.getName(), new LinkedList<io.swagger.database.model.CompletePoll>()));
+        try {
+            roomRepository.save(new io.swagger.database.model.CompleteRoom(user, room.getName(), new LinkedList<CompleteQuestion>()));
+        }catch (DataIntegrityViolationException e)
+        {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -121,7 +123,7 @@ public class RoomsApiController implements RoomsApi {
         tmp.setId(completeRoomDB.getId());
         tmp.setOwner(completeRoomDB.getOwner().getId());
         tmp.setName(completeRoomDB.getName());
-        tmp.setPolls(Converter.pollsFromModelToDTO(completeRoomDB, true));
+        tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoomDB, true));
 
         return new ResponseEntity<>(tmp, HttpStatus.OK);
     }
@@ -159,139 +161,26 @@ public class RoomsApiController implements RoomsApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /**
-     * Deletes a poll in a room
-     *
-     * @param pId
-     * @param token
-     * @return
-     */
     @Override
-    public ResponseEntity<Void> roomsPollsPIdDelete(@ApiParam(value = "the poll", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsRoomIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "Question to be added", required = true) @RequestBody Question question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
-        io.swagger.database.model.CompletePoll completePollDB = pollRepository.findOne(pId);
-        if(completePollDB == null)
+        io.swagger.database.model.CompleteRoom completeRoom = roomRepository.findOne(roomId);
+        if(completeRoom == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if(completePollDB.getCompleteRoom().getOwner().getId() != user.getId())
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-        pollRepository.delete(completePollDB);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * Creates a poll in a room
-     *
-     * @param roomId
-     * @param poll
-     * @param token
-     * @return
-     */
-    @Override
-    public ResponseEntity<Void> roomsRoomIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "poll to be created", required = true) @RequestBody Poll poll, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
-        User user = getUserDB(token);
-        if(user==null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        io.swagger.database.model.CompleteRoom completeRoomDB = roomRepository.findOne(roomId);
-        if(completeRoomDB == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        if(user.getId() != completeRoomDB.getOwner().getId())
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-        if(poll == null || poll.getName() == null || poll.getName().isEmpty())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        io.swagger.database.model.CompletePoll completePoll = new io.swagger.database.model.CompletePoll(poll.getName(), completeRoomDB, new LinkedList<io.swagger.database.model.CompleteQuestion>());
-        pollRepository.save(completePoll);
-        completeRoomDB.getPolls().add(completePoll);
-        roomRepository.save(completeRoomDB);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    /**
-     * Gets a poll in a room
-     *
-     * @param pId
-     * @return
-     */
-    @Override
-    public ResponseEntity<CompletePoll> roomsPollsPIdGet(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("pId") Long pId) {
-        io.swagger.database.model.CompletePoll completePollDB = pollRepository.findOne(pId);
-        if(completePollDB == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        CompletePoll tmp = new CompletePoll();
-        tmp.setId(completePollDB.getId());
-        tmp.setName(completePollDB.getName());
-        tmp.setQuestions(Converter.questionsFromModelToDTO(completePollDB, true));
-        return new ResponseEntity<>(tmp, HttpStatus.OK);
-    }
-
-    /**
-     * Patches a poll in a room
-     *
-     * @param pId
-     * @param poll
-     * @param token
-     * @return
-     */
-    @Override
-    public ResponseEntity<Void> roomsPollsPIdPatch(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "the poll", required = true) @RequestBody Poll poll, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
-        User user = getUserDB(token);
-        if(user==null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        io.swagger.database.model.CompletePoll completePollDB = pollRepository.findOne(pId);
-        if(completePollDB == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        if(user.getId() != completePollDB.getCompleteRoom().getOwner().getId())
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-        if(poll == null || poll.getName() == null || poll.getName().isEmpty())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        completePollDB.setName(poll.getName());
-
-        pollRepository.save(completePollDB);
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * Creates a question and it's answers
-     * @param roomId
-     * @param pId
-     * @param question
-     * @param token
-     * @return
-     */
-    @Override
-    public ResponseEntity<Void> roomsRoomIdPollsPIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "the poll", required = true) @PathVariable("pId") Long pId, @ApiParam(value = "Question to be added", required = true) @RequestBody Question question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
-        User user = getUserDB(token);
-        if(user==null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        io.swagger.database.model.CompletePoll completePoll = pollRepository.findOne(pId);
-        if(completePoll == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        if(user.getId() != completePoll.getCompleteRoom().getOwner().getId())
+        if(user.getId() != completeRoom.getOwner().getId())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         if(question == null || question.getBody() == null || question.getBody().isEmpty() || question.getAnswers() == null || question.getAnswers().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        io.swagger.database.model.CompleteQuestion completeQuestion = new io.swagger.database.model.CompleteQuestion(question.getBody(), false, completePoll, new LinkedList<CompleteAnswer>());
+        io.swagger.database.model.CompleteQuestion completeQuestion = new io.swagger.database.model.CompleteQuestion(question.getBody(), false, completeRoom, new LinkedList<CompleteAnswer>());
         questionReporitory.save(completeQuestion);
-        completePoll.getQuestions().add(completeQuestion);
-        pollRepository.save(completePoll);
+        completeRoom.getQuestions().add(completeQuestion);
+        roomRepository.save(completeRoom);
 
         LinkedList<CompleteAnswer> completeAnswers = new LinkedList<>();
 
@@ -310,9 +199,8 @@ public class RoomsApiController implements RoomsApi {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
     @Override
-    public ResponseEntity<Void> roomsPollsQuestionQIdDelete(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsQuestionQIdDelete(@ApiParam(value = "poll to be deleted", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -321,7 +209,7 @@ public class RoomsApiController implements RoomsApi {
         if(completeQuestion == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if(completeQuestion.getCompletePoll().getCompleteRoom().getOwner().getId() != user.getId())
+        if(completeQuestion.getCompleteRoom().getOwner().getId() != user.getId())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         questionReporitory.delete(completeQuestion);
@@ -329,7 +217,12 @@ public class RoomsApiController implements RoomsApi {
     }
 
     @Override
-    public ResponseEntity<Void> roomsPollsQuestionQIdPatch(@ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<Void> roomsQuestionQIdGet(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("qId") Long qId) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Void> roomsQuestionQIdPatch(@ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -338,7 +231,7 @@ public class RoomsApiController implements RoomsApi {
         if(completeQuestion == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if(completeQuestion.getCompletePoll().getCompleteRoom().getOwner().getId() != user.getId())
+        if(completeQuestion.getCompleteRoom().getOwner().getId() != user.getId())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         if(question == null || question.getBody() == null || question.getBody().isEmpty() || question.getAnswers() == null || question.getAnswers().isEmpty())

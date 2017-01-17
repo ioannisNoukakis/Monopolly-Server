@@ -21,9 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created by lux on 16.01.17.
  */
@@ -82,7 +79,7 @@ public class AnswersApiController implements AnswerApi {
         completeAsnwer.setId(completeAnswerDB.getId());
         completeAsnwer.setIsValid(completeAnswerDB.isValid());
         completeAsnwer.setBody(completeAnswerDB.getBody());
-        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getCompletePoll().getId());
+        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
 
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
     }

@@ -222,117 +222,6 @@ paths:
           description: not found.
 
     post:
-      summary: New poll
-      description: |
-        Creates a new poll
-      consumes:
-        - application/json
-      parameters:
-        - name: roomId
-          in: path
-          description: the room
-          required: true
-          type: integer
-          format: int64
-        - name: poll
-          in: body
-          description: poll to be created
-          required: true
-          schema:
-            $ref: '#/definitions/poll'
-        - name: token
-          in: header
-          description: token to be passed as a header
-          required: true
-          type: string
-      responses:
-        201:
-          description: Sucessfully created.
-        400:
-          description: Bad request.
-        403:
-          description: Forbidden.
-
-  /rooms/polls/{pId}:
-    get:
-      summary: Gets a poll and its statistics
-      description: |
-        Returns the selected poll and its statistics. This endpoint can be used without an authentification.
-      produces:
-        - application/json
-      parameters:
-        - name: pId
-          in: path
-          description: poll to be retrived
-          required: true
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: the requested poll
-          schema:
-            $ref: '#/definitions/completePoll'
-        404:
-          description: Not found.
-
-    patch:
-      summary: patches poll.
-      description: patches this poll only if you owns it.
-      parameters:
-        - name: pId
-          in: path
-          description: the poll
-          required: true
-          type: integer
-          format: int64
-        - name: poll
-          in: body
-          description: the poll
-          required: true
-          schema:
-            $ref: '#/definitions/poll'
-        - name: token
-          in: header
-          description: token to be passed as a header
-          required: true
-          type: string
-      responses:
-        204:
-          description: OK
-        401:
-          description: Unauthorized.
-        403:
-          description: Forbidden.
-        404:
-          description: Not found.
-
-    delete:
-      summary: deletes this poll.
-      description: deletes this poll only if you owns it.
-      parameters:
-        - name: pId
-          in: path
-          description: the poll
-          required: true
-          type: integer
-          format: int64
-        - name: token
-          in: header
-          description: token to be passed as a header
-          required: true
-          type: string
-      responses:
-        204:
-          description: OK
-        401:
-          description: Unauthorized.
-        403:
-          description: Forbidden.
-        404:
-          description: Not found.
-
-  /rooms/{roomId}/polls/{pId}:
-    post:
       summary: add a question
       description: adds a question to your poll
       consumes:
@@ -341,12 +230,6 @@ paths:
         - name: roomId
           in: path
           description: the room
-          required: true
-          type: integer
-          format: int64
-        - name: pId
-          in: path
-          description: the poll
           required: true
           type: integer
           format: int64
@@ -366,15 +249,14 @@ paths:
         201:
           description: OK
         401:
-          description: You don't own this poll.
+          description: You don't own this room.
         403:
           description: You don't have a token.
 
-
-  /rooms/polls/question/{qId}:
+  /rooms/question/{qId}:
     patch:
       summary: patch this question
-      description: Update a question in your poll. If users are using it, they will be notified instantly via websocket.
+      description: Update a question in your room. If users are using it, they will be notified instantly via websocket.
       consumes:
         - application/json
       parameters:
@@ -407,11 +289,11 @@ paths:
 
     delete:
       summary: deletes a question
-      description: deletes a question of this poll
+      description: deletes a question of this room
       parameters:
         - name: qId
           in: path
-          description: poll to be retrived
+          description: poll to be deleted
           required: true
           type: integer
           format: int64
@@ -423,6 +305,32 @@ paths:
       responses:
         200:
           description: OK
+        401:
+          description: Unauthorized.
+        403:
+          description: Forbidden.
+        404:
+          description: Not found.
+    
+    get:
+      summary: gets a question and its statistics
+      description: gets a question and its statistics a question of this room. This method is public.
+      parameters:
+        - name: qId
+          in: path
+          description: poll to be retrived
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: OK
+        401:
+          description: Unauthorized.
+        403:
+          description: Forbidden.
+        404:
+          description: Not found,
 
   /answer:
     post:
@@ -512,37 +420,12 @@ definitions:
       - id
       - owner
       - name
-      - polls
+      - questions
     properties:
       id:
         type: integer
         format: int64
       owner:
-        type: integer
-        format: int64
-      name:
-        type: string
-      polls:
-        type: array
-        items:
-          $ref: '#/definitions/completePoll'
-
-  poll:
-    type: object
-    required:
-      - name
-    properties:
-      name:
-        type: string
-
-  completePoll:
-    type: object
-    required:
-      - id
-      - name
-      - questions
-    properties:
-      id:
         type: integer
         format: int64
       name:
@@ -609,3 +492,4 @@ definitions:
         type: string
       isValid:
         type: boolean
+      

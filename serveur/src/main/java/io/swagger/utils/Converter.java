@@ -4,9 +4,6 @@ import com.cristallium.api.dto.CompleteAsnwer;
 import com.cristallium.api.dto.CompletePoll;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.CompleteQuestion;
-import io.swagger.database.model.CompleteRoom;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,24 +13,10 @@ import java.util.List;
  */
 public class Converter {
 
-    public static List<CompletePoll> pollsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom, boolean hideAnswers)
-    {
-        LinkedList<CompletePoll> completePolls = new LinkedList<>();
-        for(io.swagger.database.model.CompletePoll completePoll : completeRoom.getPolls())
-        {
-            CompletePoll tmp = new CompletePoll();
-            tmp.setId(completePoll.getId());
-            tmp.setName(completePoll.getName());
-            tmp.setQuestions(questionsFromModelToDTO(completePoll, hideAnswers));
-            completePolls.push(tmp);
-        }
-        return completePolls;
-    }
-
-    public static List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompletePoll completePoll, boolean hideAnswers)
+    public static List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom, boolean hideAnswers)
     {
         LinkedList<com.cristallium.api.dto.CompleteQuestion> completeQuestions = new LinkedList<>();
-        for(CompleteQuestion completeQuestion: completePoll.getQuestions())
+        for(CompleteQuestion completeQuestion: completeRoom.getQuestions())
         {
             com.cristallium.api.dto.CompleteQuestion tmp = new com.cristallium.api.dto.CompleteQuestion();
             tmp.setId(completeQuestion.getId());

@@ -20,12 +20,12 @@ public class CompleteRoom {
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CompletePoll> polls;
+    private List<CompleteQuestion> questions;
 
-    public CompleteRoom(User owner, String name, List<CompletePoll> polls) {
+    public CompleteRoom(User owner, String name, List<CompleteQuestion> questions) {
         this.owner = owner;
         this.name = name;
-        this.polls = polls;
+        this.questions = questions;
     }
 
     public CompleteRoom() {
@@ -39,8 +39,8 @@ public class CompleteRoom {
         this.name = name;
     }
 
-    public void setPolls(List<CompletePoll> polls) {
-        this.polls = polls;
+    public void setQuestions(List<CompleteQuestion> questions) {
+        this.questions = questions;
     }
 
     public long getId() {
@@ -51,8 +51,8 @@ public class CompleteRoom {
         return name;
     }
 
-    public List<CompletePoll> getPolls() {
-        return polls;
+    public List<CompleteQuestion> getQuestions() {
+        return questions;
     }
 
     public User getOwner() {

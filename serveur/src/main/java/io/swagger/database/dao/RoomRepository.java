@@ -1,6 +1,5 @@
 package io.swagger.database.dao;
 
-import io.swagger.database.model.CompletePoll;
 import io.swagger.database.model.CompleteRoom;
 import io.swagger.database.model.User;
 import org.springframework.data.repository.CrudRepository;
