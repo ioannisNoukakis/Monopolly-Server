@@ -318,19 +318,17 @@ paths:
       parameters:
         - name: qId
           in: path
-          description: poll to be retrived
+          description: question to be retrived
           required: true
           type: integer
           format: int64
       responses:
         200:
           description: OK
-        401:
-          description: Unauthorized.
-        403:
-          description: Forbidden.
+          schema:
+             $ref: '#/definitions/statisticalQuestion'
         404:
-          description: Not found,
+          description: Not found.
 
   /answer:
     post:
@@ -396,6 +394,18 @@ definitions:
       username:
         type: string
       password:
+        type: string
+
+  userDTO:
+    type: object
+    required:
+      - id
+      - username
+    properties:
+      id:
+        type: integer
+        format: int64
+      username:
         type: string
 
   token:
@@ -492,4 +502,45 @@ definitions:
         type: string
       isValid:
         type: boolean
-      
+
+  statisticalQuestion:
+    type: object
+    required:
+      - id
+      - body
+      - answers
+      - closed
+    properties:
+      id:
+        type: integer
+        format: int64
+      body:
+        type: string
+      answers:
+        type: array
+        items:
+          $ref: '#/definitions/statisticalAnswer'
+      closed:
+        type: boolean
+
+  statisticalAnswer:
+    type: object
+    required:
+      - id
+      - body
+      - users
+      - isValid
+    properties:
+      id:
+        type: integer
+        format: int64
+      body:
+        type: string
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/userDTO'
+      isValid:
+        type: boolean
+
+  

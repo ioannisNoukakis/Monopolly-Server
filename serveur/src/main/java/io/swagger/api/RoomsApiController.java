@@ -240,9 +240,21 @@ public class RoomsApiController implements RoomsApi {
     }
 
     @Override
-    public ResponseEntity<Void> roomsQuestionQIdGet(@ApiParam(value = "poll to be retrived", required = true) @PathVariable("qId") Long qId) {
-        return null;
+    public ResponseEntity<StatisticalQuestion> roomsQuestionQIdGet(@ApiParam(value = "question to be retrived", required = true) @PathVariable("qId") Long qId) {
+
+        io.swagger.database.model.CompleteQuestion completeQuestion = questionReporitory.findOne(qId);
+        if(completeQuestion == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        StatisticalQuestion statisticalQuestion = new StatisticalQuestion();
+        statisticalQuestion.setId(completeQuestion.getId());
+        statisticalQuestion.setBody(completeQuestion.getBody());
+        statisticalQuestion.setClosed(completeQuestion.isClosed());
+        statisticalQuestion.setAnswers(Converter.statisticalAnswersFromModelToDTO(completeQuestion));
+
+        return new ResponseEntity<>(statisticalQuestion, HttpStatus.OK);
     }
+
 
     @Override
     public ResponseEntity<Void> roomsQuestionQIdPatch(@ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
