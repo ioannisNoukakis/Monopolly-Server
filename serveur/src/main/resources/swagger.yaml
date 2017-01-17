@@ -255,9 +255,9 @@ paths:
 
   /rooms/polls/{pId}:
     get:
-      summary: Gets a poll
+      summary: Gets a poll and its statistics
       description: |
-        Returns the selected poll. This endpoint can be used without an authentification.
+        Returns the selected poll and its statistics. This endpoint can be used without an authentification.
       produces:
         - application/json
       parameters:
@@ -454,7 +454,28 @@ paths:
         409:
           description: You already have submitted an answer.
 
-
+  /subscribe/{roomName}:
+    post:
+      summary: Add yourself to a room.
+      description: Suscribes you to a room. Grants you the rights to post answers to the questions of this room.
+      parameters:
+        - name: roomName
+          in: path
+          description: the room to join.
+          required: true
+          type: string
+        - name: token
+          in: header
+          description: token to be passed as a header
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK - you have joined this room.
+        403:
+          description: You don't have a token.
+        404:
+          description: Room not found.
 
 
 definitions:

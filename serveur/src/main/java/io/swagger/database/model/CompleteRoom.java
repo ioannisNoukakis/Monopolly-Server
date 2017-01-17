@@ -16,6 +16,7 @@ public class CompleteRoom {
     @JoinColumn(name="OWNER_ID")
     private User owner;
 
+    @Column(unique=true)
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
