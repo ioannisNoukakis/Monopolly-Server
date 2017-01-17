@@ -1,8 +1,6 @@
 package io.swagger.DataWatcher;
 
-import com.cristallium.api.dto.CompleteQuestion;
-import com.cristallium.api.dto.Question;
-import io.swagger.utils.JSONParser;
+import io.swagger.websocket.Subscription;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -18,7 +16,7 @@ import java.util.List;
 public class AnswerWatcher {
 
     private static AnswerWatcher instance;
-    private List<WebSocketSession> clients;
+    private List<Subscription> clients;
 
     public static AnswerWatcher getInstance() {
         if(instance == null)
@@ -27,26 +25,34 @@ public class AnswerWatcher {
     }
 
     private AnswerWatcher() {
-        clients = Collections.<WebSocketSession>synchronizedList(new LinkedList<WebSocketSession>());
+        clients = Collections.<Subscription>synchronizedList(new LinkedList<Subscription>());
     }
 
-    public void addClient(WebSocketSession session)
+    public void addClient(Subscription subscription)
     {
-        clients.add(session);
+        clients.add(subscription);
     }
 
-    public void removeClient(WebSocketSession session)
+    public void removeClient(Subscription subscription)
     {
-        clients.remove(session);
+        clients.remove(subscription);
     }
 
-    public void notifyClients(String message) throws IOException {
-        Iterator<WebSocketSession> iterator = clients.iterator();
+    public void notifyClients(String message, Long pollid) {
+        Iterator<Subscription> iterator = clients.iterator();
 
+        System.out.println("[ANSWER_WATCHER] Notifying clients on " + pollid + "...");
         synchronized (clients) {
             while (iterator.hasNext()) {
-                WebSocketSession next = iterator.next();
-                next.sendMessage(new TextMessage(message));
+                Subscription su = iterator.next();
+                try {
+                    if(su.getPoillid() == pollid) {
+                        System.out.println("[ANSWER_WATCHER] Message sent.");
+                        su.getSession().sendMessage(new TextMessage(message));
+                    }
+                } catch (IOException e) {
+                    clients.remove(su);
+                }
             }
         }
     }

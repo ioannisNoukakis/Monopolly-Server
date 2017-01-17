@@ -4,19 +4,25 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.AnswerApi;
 import com.cristallium.api.dto.CompleteAsnwer;
 import com.cristallium.api.dto.CompleteQuestion;
+import io.swagger.DataWatcher.AnswerWatcher;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.AnswerRepository;
 import io.swagger.database.dao.UserRepository;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.User;
 import io.swagger.utils.Converter;
+import io.swagger.utils.JSONParser;
 import io.swagger.utils.JWTutils;
+import io.swagger.websocket.dto.reply.UserAnswer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by lux on 16.01.17.
@@ -54,10 +60,10 @@ public class AnswersApiController implements AnswerApi {
         if(answer == null || answer.getIsValid() == null || answer.getBody() == null || answer.getBody().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        //on vérifie que l'utilisateur n'as pas déjà répondu à cette question
-        for(CompleteAnswer cAnswer : answerRepository.getAnswerByUser(userDB))
+
+        for(CompleteAnswer cAnswer : userDB.getAnswers()) //on charge les réponses que l'utilisateur à déjà entré
         {
-            if(cAnswer.getUser().contains(userDB))
+            if (cAnswer.getCompleteQuestion().getId() == completeAnswerDB.getCompleteQuestion().getId())//on vérifie que l'utilisateur n'as pas déjà répondu à cette question
                 return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
@@ -72,6 +78,17 @@ public class AnswersApiController implements AnswerApi {
         completeQuestion.setClosed(completeAnswerDB.getCompleteQuestion().isClosed());
         completeQuestion.setAnswers(Converter.answersFromModelToDTO(completeAnswerDB.getCompleteQuestion(), false));
 
+        CompleteAsnwer completeAsnwer = new CompleteAsnwer();
+        completeAsnwer.setId(completeAnswerDB.getId());
+        completeAsnwer.setIsValid(completeAnswerDB.isValid());
+        completeAsnwer.setBody(completeAnswerDB.getBody());
+        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getCompletePoll().getId());
+
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
+    }
+
+    private void notifyUserForGivenAnswer(CompleteAsnwer completeAsnwer, User user, Long pollid)
+    {
+        AnswerWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(user.getId(), user.getUsername(), completeAsnwer)), pollid);
     }
 }

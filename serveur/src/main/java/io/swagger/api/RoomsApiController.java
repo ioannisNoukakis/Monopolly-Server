@@ -121,7 +121,7 @@ public class RoomsApiController implements RoomsApi {
         tmp.setId(completeRoomDB.getId());
         tmp.setOwner(completeRoomDB.getOwner().getId());
         tmp.setName(completeRoomDB.getName());
-        tmp.setPolls(Converter.pollsFromModelToDTO(completeRoomDB));
+        tmp.setPolls(Converter.pollsFromModelToDTO(completeRoomDB, true));
 
         return new ResponseEntity<>(tmp, HttpStatus.OK);
     }
@@ -229,7 +229,7 @@ public class RoomsApiController implements RoomsApi {
         CompletePoll tmp = new CompletePoll();
         tmp.setId(completePollDB.getId());
         tmp.setName(completePollDB.getName());
-        tmp.setQuestions(Converter.questionsFromModelToDTO(completePollDB));
+        tmp.setQuestions(Converter.questionsFromModelToDTO(completePollDB, true));
         return new ResponseEntity<>(tmp, HttpStatus.OK);
     }
 

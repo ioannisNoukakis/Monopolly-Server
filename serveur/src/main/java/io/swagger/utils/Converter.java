@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class Converter {
 
-    public static List<CompletePoll> pollsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom)
+    public static List<CompletePoll> pollsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom, boolean hideAnswers)
     {
         LinkedList<CompletePoll> completePolls = new LinkedList<>();
         for(io.swagger.database.model.CompletePoll completePoll : completeRoom.getPolls())
@@ -24,13 +24,13 @@ public class Converter {
             CompletePoll tmp = new CompletePoll();
             tmp.setId(completePoll.getId());
             tmp.setName(completePoll.getName());
-            tmp.setQuestions(questionsFromModelToDTO(completePoll));
+            tmp.setQuestions(questionsFromModelToDTO(completePoll, hideAnswers));
             completePolls.push(tmp);
         }
         return completePolls;
     }
 
-    public static List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompletePoll completePoll)
+    public static List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompletePoll completePoll, boolean hideAnswers)
     {
         LinkedList<com.cristallium.api.dto.CompleteQuestion> completeQuestions = new LinkedList<>();
         for(CompleteQuestion completeQuestion: completePoll.getQuestions())
@@ -38,7 +38,8 @@ public class Converter {
             com.cristallium.api.dto.CompleteQuestion tmp = new com.cristallium.api.dto.CompleteQuestion();
             tmp.setId(completeQuestion.getId());
             tmp.setBody(completeQuestion.getBody());
-            tmp.setAnswers(answersFromModelToDTO(completeQuestion, false));
+            tmp.setClosed(completeQuestion.isClosed());
+            tmp.setAnswers(answersFromModelToDTO(completeQuestion, hideAnswers));
             completeQuestions.push(tmp);
         }
         return completeQuestions;
