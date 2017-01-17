@@ -22,13 +22,25 @@ public class CompleteRoom {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CompleteQuestion> questions;
 
-    public CompleteRoom(User owner, String name, List<CompleteQuestion> questions) {
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<User> subscribers;
+
+    public CompleteRoom(User owner, String name, List<CompleteQuestion> questions, List<User> subscribers) {
         this.owner = owner;
         this.name = name;
         this.questions = questions;
+        this.subscribers = subscribers;
     }
 
     public CompleteRoom() {
+    }
+
+    public List<User> getSubscribers() {
+        return subscribers;
+    }
+
+    public void setSubscribers(List<User> subscribers) {
+        this.subscribers = subscribers;
     }
 
     public void setId(long id) {

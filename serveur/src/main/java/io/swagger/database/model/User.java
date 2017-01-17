@@ -23,15 +23,27 @@ public class User {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CompleteAnswer> answers;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CompleteRoom> subscribed;
+
     public User(){
 
     }
 
-    public User(String username, String password, List<CompleteRoom> rooms, List<CompleteAnswer> answers) {
+    public User(String username, String password, List<CompleteRoom> rooms, List<CompleteAnswer> answers, List<CompleteRoom> subscribed) {
         this.username = username;
         this.password = password;
         this.rooms = rooms;
         this.answers = answers;
+        this.subscribed = subscribed;
+    }
+
+    public List<CompleteRoom> getSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(List<CompleteRoom> subscribed) {
+        this.subscribed = subscribed;
     }
 
     public long getId() {

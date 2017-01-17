@@ -73,7 +73,7 @@ public class UserApiController implements UserApi {
         if(user == null || user.getUsername() == null || user.getPassword() == null || user.getUsername().isEmpty() || user.getPassword().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         try {
-            userRepository.save(new io.swagger.database.model.User(user.getUsername(), user.getPassword(), new LinkedList<io.swagger.database.model.CompleteRoom>(), new LinkedList<CompleteAnswer>()));
+            userRepository.save(new io.swagger.database.model.User(user.getUsername(), user.getPassword(), new LinkedList<io.swagger.database.model.CompleteRoom>(), new LinkedList<CompleteAnswer>(), new LinkedList<io.swagger.database.model.CompleteRoom>()));
         }catch (DataIntegrityViolationException e)
         {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -83,16 +83,27 @@ public class UserApiController implements UserApi {
 
     @Override
     public ResponseEntity<List<CompleteRoom>> userRoomsGet(@ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
-        long id = -1;
+        long id;
         try{
             id = JWTutils.parseToken(token);
         }
         catch (JWTDecodeException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return null;
         }
+        io.swagger.database.model.User userDB = userRepository.findOne(id);
+
+        if(userDB==null)
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         LinkedList<CompleteRoom> completeRooms = new LinkedList<>();
-        for(io.swagger.database.model.CompleteRoom completeRoom : roomRepository.getByOwner(userRepository.findOne(id)))
+        completeRooms = addToList(completeRooms, roomRepository.getByOwner(userRepository.findOne(id)));
+        completeRooms = addToList(completeRooms, userDB.getSubscribed());
+        return new ResponseEntity<>((List<CompleteRoom>)completeRooms, HttpStatus.OK);
+    }
+
+    private LinkedList<CompleteRoom> addToList(LinkedList<CompleteRoom> completeRooms, List<io.swagger.database.model.CompleteRoom> b)
+    {
+        for(io.swagger.database.model.CompleteRoom completeRoom : b)
         {
             CompleteRoom tmp = new CompleteRoom();
             tmp.setId(completeRoom.getId());
@@ -101,7 +112,6 @@ public class UserApiController implements UserApi {
             tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoom, false));
             completeRooms.push(tmp);
         }
-
-        return new ResponseEntity<>((List<CompleteRoom>)completeRooms, HttpStatus.OK);
+        return completeRooms;
     }
 }

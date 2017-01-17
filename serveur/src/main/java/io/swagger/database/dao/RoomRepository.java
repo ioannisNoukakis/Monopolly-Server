@@ -11,4 +11,5 @@ import java.util.List;
  */
 public interface RoomRepository extends CrudRepository<CompleteRoom, Long> {
     List<CompleteRoom> getByOwner(User user);
+    CompleteRoom findByName(String name);
 }

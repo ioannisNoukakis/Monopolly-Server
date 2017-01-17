@@ -72,7 +72,7 @@ public class RoomsApiController implements RoomsApi {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         try {
-            roomRepository.save(new io.swagger.database.model.CompleteRoom(user, room.getName(), new LinkedList<CompleteQuestion>()));
+            roomRepository.save(new io.swagger.database.model.CompleteRoom(user, room.getName(), new LinkedList<CompleteQuestion>(), new LinkedList<User>()));
         }catch (DataIntegrityViolationException e)
         {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -115,6 +115,7 @@ public class RoomsApiController implements RoomsApi {
         }
         completeRoomDB.setQuestions(new LinkedList<CompleteQuestion>());
         completeRoomDB.setOwner(null);
+        completeRoomDB.setSubscribers(new LinkedList<User>());
         roomRepository.delete(completeRoomDB);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

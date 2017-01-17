@@ -382,6 +382,8 @@ paths:
           description: You don't have a token.
         404:
           description: Room not found.
+        409:
+          description: You are already subscribed to this room.
 
 
 definitions:
@@ -543,4 +545,3 @@ definitions:
       isValid:
         type: boolean
 
-  
