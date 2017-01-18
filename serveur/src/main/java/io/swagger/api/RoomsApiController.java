@@ -3,13 +3,16 @@ package io.swagger.api;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.RoomsApi;
 import com.cristallium.api.dto.*;
+import io.swagger.DataWatcher.QuestionWatcher;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.*;
 import io.swagger.database.model.*;
 import io.swagger.database.model.CompleteQuestion;
 import io.swagger.database.model.User;
 import io.swagger.utils.Converter;
+import io.swagger.utils.JSONParser;
 import io.swagger.utils.JWTutils;
+import io.swagger.websocket.dto.reply.QuestionReply;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -210,7 +213,16 @@ public class RoomsApiController implements RoomsApi {
             completeAnswers.push(tmp);
         }
         completeQuestion.setAnswers(completeAnswers);
-        questionReporitory.save(completeQuestion);
+        completeQuestion = questionReporitory.save(completeQuestion);
+
+        com.cristallium.api.dto.CompleteQuestion questionDTO = new com.cristallium.api.dto.CompleteQuestion();
+        questionDTO.setBody(completeQuestion.getBody());
+        questionDTO.setId(completeQuestion.getId());
+        questionDTO.setAnswers(Converter.answersFromModelToDTO(completeQuestion, true));
+        questionDTO.setClosed(completeQuestion.isClosed());
+
+        QuestionWatcher.getInstance().notifyClients(JSONParser.toJson(new QuestionReply(questionDTO)), completeQuestion.getId());
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

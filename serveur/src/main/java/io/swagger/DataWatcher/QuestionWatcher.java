@@ -10,20 +10,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by durza9390 on 16.01.2017.
+ * Created by durza9390 on 18.01.2017.
  */
-public class AnswerWatcher {
-
-    private static AnswerWatcher instance;
+public class QuestionWatcher {
+    private static QuestionWatcher instance;
     private List<Subscription> clients;
 
-    public static AnswerWatcher getInstance() {
+    public static QuestionWatcher getInstance() {
         if(instance == null)
-            instance = new AnswerWatcher();
+            instance = new QuestionWatcher();
         return instance;
     }
 
-    private AnswerWatcher() {
+    private QuestionWatcher() {
         clients = Collections.<Subscription>synchronizedList(new LinkedList<Subscription>());
     }
 
@@ -37,15 +36,15 @@ public class AnswerWatcher {
         clients.remove(subscription);
     }
 
-    public void notifyClients(String message, Long questionId) {
+    public void notifyClients(String message, Long suObjectId) {
         Iterator<Subscription> iterator = clients.iterator();
 
-        System.out.println("[ANSWER_WATCHER] Notifying clients on " + questionId + "...");
+        System.out.println("[QUESTION_WATCHER] Notifying clients on " + suObjectId + "...");
         synchronized (clients) {
             while (iterator.hasNext()) {
                 Subscription su = iterator.next();
                 try {
-                    if(su.getSubOjbectId() == questionId) {
+                    if(su.getSubOjbectId() == suObjectId) {
                         System.out.println("[ANSWER_WATCHER] Message sent.");
                         su.getSession().sendMessage(new TextMessage(message));
                     }

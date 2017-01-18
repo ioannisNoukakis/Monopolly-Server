@@ -57,6 +57,8 @@ public class AnswersApiController implements AnswerApi {
         if(answer == null || answer.getIsValid() == null || answer.getBody() == null || answer.getBody().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+        if(completeAnswerDB.getCompleteQuestion().isClosed())
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
 
         for(CompleteAnswer cAnswer : userDB.getAnswers()) //on charge les réponses que l'utilisateur à déjà entré
         {
@@ -84,8 +86,8 @@ public class AnswersApiController implements AnswerApi {
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
     }
 
-    private void notifyUserForGivenAnswer(CompleteAsnwer completeAsnwer, User user, Long pollid)
+    private void notifyUserForGivenAnswer(CompleteAsnwer completeAsnwer, User user, Long questionId)
     {
-        AnswerWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(user.getId(), user.getUsername(), completeAsnwer)), pollid);
+        AnswerWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(user.getId(), user.getUsername(), completeAsnwer)), questionId);
     }
 }

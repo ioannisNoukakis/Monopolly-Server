@@ -6,25 +6,25 @@ package io.swagger.websocket.dto;
 public class SubscriptionMessage {
     private String token;
     private String endpoint;
-    private Long questionId;
+    private Long subOjbectId;
     private boolean subscribe;
 
-    public SubscriptionMessage(String token, String endpoint, Long questionId, boolean subscribe) {
+    public SubscriptionMessage(String token, String endpoint, Long SubOjbectId, boolean subscribe) {
         this.token = token;
         this.endpoint = endpoint;
-        this.questionId = questionId;
+        this.subOjbectId = SubOjbectId;
         this.subscribe = subscribe;
     }
 
     public SubscriptionMessage() {
     }
 
-    public Long getQuestionId() {
-        return questionId;
+    public Long getSubOjbectId() {
+        return subOjbectId;
     }
 
-    public void setQuestionId(Long questionId) {
-        this.questionId = questionId;
+    public void setSubOjbectId(Long subOjbectId) {
+        this.subOjbectId = subOjbectId;
     }
 
     public String getToken() {
