@@ -32,6 +32,7 @@ public class AuthApiController implements AuthApi {
 
         Token token = new Token();
         token.setToken(JWTutils.createToken(""+userDB.getId()));
+        token.setUserId(userDB.getId());
         return new ResponseEntity<Token>(token, HttpStatus.OK);
     }
 

@@ -413,8 +413,12 @@ definitions:
   token:
     type: object
     required:
+      - userId
       - token
     properties:
+      userId:
+        type: integer
+        format: int64
       token:
         type: string
 
