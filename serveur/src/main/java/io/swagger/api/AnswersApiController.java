@@ -10,6 +10,7 @@ import io.swagger.database.dao.AnswerRepository;
 import io.swagger.database.dao.UserRepository;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.User;
+import io.swagger.service.TransactionnalService;
 import io.swagger.utils.Converter;
 import io.swagger.utils.JSONParser;
 import io.swagger.utils.JWTutils;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -28,13 +30,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public class AnswersApiController implements AnswerApi {
 
     @Autowired
+    TransactionnalService transactionnalService;
+
+    @Autowired
     AnswerRepository answerRepository;
 
     @Autowired
     UserRepository userRepository;
 
     @Override
-    public ResponseEntity<CompleteQuestion> answerPost(@ApiParam(value = "The answer to be submitted.", required = true) @RequestBody CompleteAsnwer answer, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<CompleteQuestion> answerPost(@ApiParam(value = "The answer to be submitted.", required = true) @RequestBody CompleteAsnwer answer, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         long id;
         try{
             id = JWTutils.parseToken(token);
@@ -54,7 +59,7 @@ public class AnswersApiController implements AnswerApi {
         if(completeAnswerDB.getCompleteQuestion().isClosed())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        if(answer == null || answer.getIsValid() == null || answer.getBody() == null || answer.getBody().isEmpty())
+        if(answer == null || answer.getId() == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         if(completeAnswerDB.getCompleteQuestion().isClosed())
@@ -70,7 +75,6 @@ public class AnswersApiController implements AnswerApi {
         completeAnswerDB.getUser().add(userDB);
 
         userRepository.save(userDB);
-        answerRepository.save(completeAnswerDB);
 
         CompleteQuestion completeQuestion = new CompleteQuestion();
         completeQuestion.setBody(completeAnswerDB.getCompleteQuestion().getBody());
@@ -81,8 +85,8 @@ public class AnswersApiController implements AnswerApi {
         completeAsnwer.setId(completeAnswerDB.getId());
         completeAsnwer.setIsValid(completeAnswerDB.isValid());
         completeAsnwer.setBody(completeAnswerDB.getBody());
-        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
 
+        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
     }
 

@@ -96,7 +96,7 @@ public class UserApiController implements UserApi {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         LinkedList<CompleteRoom> completeRooms = new LinkedList<>();
-        completeRooms = addToList(completeRooms, roomRepository.getByOwner(userRepository.findOne(id)));
+        completeRooms = addToList(completeRooms, roomRepository.findByOwner(userRepository.findOne(id)));
         completeRooms = addToList(completeRooms, userDB.getSubscribed());
         return new ResponseEntity<>((List<CompleteRoom>)completeRooms, HttpStatus.OK);
     }
