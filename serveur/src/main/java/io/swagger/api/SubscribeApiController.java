@@ -46,7 +46,7 @@ public class SubscribeApiController implements SubscribeApi {
         if(completeRoom == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        if(userDB.getSubscribed().contains(completeRoom))
+        if(userDB.getSubscribed().contains(completeRoom) || completeRoom.getOwner().getId() == userDB.getId())
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
         userDB.getSubscribed().add(completeRoom);

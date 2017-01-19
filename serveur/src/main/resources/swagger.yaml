@@ -248,6 +248,8 @@ paths:
       responses:
         201:
           description: OK
+          schema:
+            $ref: '#/definitions/completeQuestion'
         401:
           description: You don't own this room.
         403:

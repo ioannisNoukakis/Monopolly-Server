@@ -180,7 +180,7 @@ public class RoomsApiController implements RoomsApi {
     }
 
     @Override
-    public ResponseEntity<Void> roomsRoomIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "Question to be added", required = true) @RequestBody Question question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<com.cristallium.api.dto.CompleteQuestion> roomsRoomIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "Question to be added", required = true) @RequestBody Question question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -223,7 +223,7 @@ public class RoomsApiController implements RoomsApi {
 
         QuestionWatcher.getInstance().notifyClients(JSONParser.toJson(new QuestionReply(questionDTO)), completeQuestion.getId());
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(questionDTO, HttpStatus.CREATED);
     }
 
     @Override
