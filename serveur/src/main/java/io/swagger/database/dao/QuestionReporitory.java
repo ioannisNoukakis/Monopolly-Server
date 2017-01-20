@@ -7,6 +7,5 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Created by lux on 14.01.17.
  */
-@Transactional
 public interface QuestionReporitory extends CrudRepository<CompleteQuestion, Long> {
 }

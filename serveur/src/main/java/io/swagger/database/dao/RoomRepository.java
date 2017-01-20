@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * Created by lux on 14.01.17.
  */
-@Transactional
 public interface RoomRepository extends CrudRepository<CompleteRoom, Long> {
     List<CompleteRoom> findByOwner(User user);
     CompleteRoom findByName(String name);

@@ -10,7 +10,6 @@ import io.swagger.database.dao.AnswerRepository;
 import io.swagger.database.dao.UserRepository;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.User;
-import io.swagger.service.TransactionnalService;
 import io.swagger.utils.Converter;
 import io.swagger.utils.JSONParser;
 import io.swagger.utils.JWTutils;
@@ -28,9 +27,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
  */
 @Controller
 public class AnswersApiController implements AnswerApi {
-
-    @Autowired
-    TransactionnalService transactionnalService;
 
     @Autowired
     AnswerRepository answerRepository;
