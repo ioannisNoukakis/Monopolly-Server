@@ -1,7 +1,5 @@
 package io.swagger.database.model;
 
-import org.hibernate.annotations.ManyToAny;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -22,16 +20,16 @@ public class CompleteAnswer {
     private CompleteQuestion completeQuestion;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<User> user;
+    private List<User> users;
 
     public CompleteAnswer() {
     }
 
-    public CompleteAnswer(String body, boolean isValid, CompleteQuestion completeQuestion, List<User> user) {
+    public CompleteAnswer(String body, boolean isValid, CompleteQuestion completeQuestion, List<User> users) {
         this.body = body;
         this.isValid = isValid;
         this.completeQuestion = completeQuestion;
-        this.user = user;
+        this.users = users;
     }
 
     public void setId(long id) {
@@ -66,11 +64,11 @@ public class CompleteAnswer {
         this.completeQuestion = completeQuestion;
     }
 
-    public List<User> getUser() {
-        return user;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setUser(List<User> user) {
-        this.user = user;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

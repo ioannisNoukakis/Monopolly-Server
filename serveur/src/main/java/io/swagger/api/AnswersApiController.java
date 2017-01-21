@@ -4,7 +4,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.AnswerApi;
 import com.cristallium.api.dto.CompleteAsnwer;
 import com.cristallium.api.dto.CompleteQuestion;
-import io.swagger.DataWatcher.AnswerWatcher;
+import io.swagger.DataWatcher.DataWatcher;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.AnswerRepository;
 import io.swagger.database.dao.UserRepository;
@@ -18,8 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
@@ -34,8 +33,13 @@ public class AnswersApiController implements AnswerApi {
     @Autowired
     UserRepository userRepository;
 
+    private void notifyUserForGivenAnswer(CompleteAsnwer completeAsnwer, User user, Long questionId, Long roomId)
+    {
+        DataWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(user.getId(), user.getUsername(), completeAsnwer,questionId)), roomId);
+    }
+
     @Override
-    public synchronized ResponseEntity<CompleteQuestion> answerPost(@ApiParam(value = "The answer to be submitted.", required = true) @RequestBody CompleteAsnwer answer, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public ResponseEntity<CompleteQuestion> answerAIdPost(@ApiParam(value = "the id of the answer", required = true) @PathVariable("aId") Long aId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         long id;
         try{
             id = JWTutils.parseToken(token);
@@ -48,15 +52,12 @@ public class AnswersApiController implements AnswerApi {
         if(userDB==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
-        CompleteAnswer completeAnswerDB = answerRepository.findOne(answer.getId());
+        CompleteAnswer completeAnswerDB = answerRepository.findOne(aId);
         if(completeAnswerDB == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if(completeAnswerDB.getCompleteQuestion().isClosed())
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-        if(answer == null || answer.getId() == null)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         if(completeAnswerDB.getCompleteQuestion().isClosed())
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -68,26 +69,23 @@ public class AnswersApiController implements AnswerApi {
         }
 
         userDB.getAnswers().add(completeAnswerDB);
-        completeAnswerDB.getUser().add(userDB);
+        completeAnswerDB.getUsers().add(userDB);
 
         userRepository.save(userDB);
+        answerRepository.save(completeAnswerDB);
 
         CompleteQuestion completeQuestion = new CompleteQuestion();
         completeQuestion.setBody(completeAnswerDB.getCompleteQuestion().getBody());
         completeQuestion.setClosed(completeAnswerDB.getCompleteQuestion().isClosed());
         completeQuestion.setAnswers(Converter.answersFromModelToDTO(completeAnswerDB.getCompleteQuestion(), false));
+        completeQuestion.setCanAnswer(false);
 
         CompleteAsnwer completeAsnwer = new CompleteAsnwer();
         completeAsnwer.setId(completeAnswerDB.getId());
         completeAsnwer.setIsValid(completeAnswerDB.isValid());
         completeAsnwer.setBody(completeAnswerDB.getBody());
 
-        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
+        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getId(), completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
-    }
-
-    private void notifyUserForGivenAnswer(CompleteAsnwer completeAsnwer, User user, Long questionId)
-    {
-        AnswerWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(user.getId(), user.getUsername(), completeAsnwer)), questionId);
     }
 }

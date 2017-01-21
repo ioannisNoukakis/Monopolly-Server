@@ -2,12 +2,12 @@ package io.swagger.utils;
 
 import com.cristallium.api.dto.CompleteAsnwer;
 import com.cristallium.api.dto.StatisticalAnswer;
-import com.cristallium.api.dto.StatisticalQuestion;
 import com.cristallium.api.dto.UserDTO;
 import io.swagger.database.model.CompleteAnswer;
 import io.swagger.database.model.CompleteQuestion;
-import io.swagger.database.model.CompleteRoom;
 import io.swagger.database.model.User;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class Converter {
 
-    public static List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom, boolean hideAnswers)
+    public static List<com.cristallium.api.dto.CompleteQuestion> questionsFromModelToDTO(io.swagger.database.model.CompleteRoom completeRoom, User user, boolean hideAnswers)
     {
         LinkedList<com.cristallium.api.dto.CompleteQuestion> completeQuestions = new LinkedList<>();
         for(CompleteQuestion completeQuestion: completeRoom.getQuestions())
@@ -27,9 +27,24 @@ public class Converter {
             tmp.setBody(completeQuestion.getBody());
             tmp.setClosed(completeQuestion.isClosed());
             tmp.setAnswers(answersFromModelToDTO(completeQuestion, hideAnswers));
+            if(user != null) {
+                tmp.setCanAnswer(canAnswer(user, completeQuestion));
+            }
             completeQuestions.push(tmp);
         }
         return completeQuestions;
+    }
+
+    public static boolean canAnswer(User user, CompleteQuestion completeQuestion)
+    {
+            boolean can = true;
+            for(CompleteAnswer cAnswer : user.getAnswers()) //on charge les réponses que l'utilisateur à déjà entré
+            {
+                if (cAnswer.getCompleteQuestion().getId() == completeQuestion.getId()) {//on vérifie que l'utilisateur n'as pas déjà répondu à cette question
+                    return false;
+                }
+            }
+        return true;
     }
 
     /**
@@ -65,7 +80,7 @@ public class Converter {
             tmp.setIsValid(completeAnswer.isValid());
 
             List<UserDTO> userDTOs = new LinkedList<>();
-            for(User user : completeAnswer.getUser())
+            for(User user : completeAnswer.getUsers())
             {
                 UserDTO u = new UserDTO();
                 u.setId(user.getId());

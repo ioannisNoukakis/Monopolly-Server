@@ -12,18 +12,18 @@ import java.util.List;
 /**
  * Created by durza9390 on 16.01.2017.
  */
-public class AnswerWatcher {
+public class DataWatcher {
 
-    private static AnswerWatcher instance;
+    private static DataWatcher instance;
     private List<Subscription> clients;
 
-    public static AnswerWatcher getInstance() {
+    public static DataWatcher getInstance() {
         if(instance == null)
-            instance = new AnswerWatcher();
+            instance = new DataWatcher();
         return instance;
     }
 
-    private AnswerWatcher() {
+    private DataWatcher() {
         clients = Collections.<Subscription>synchronizedList(new LinkedList<Subscription>());
     }
 
@@ -37,11 +37,10 @@ public class AnswerWatcher {
         clients.remove(subscription);
     }
 
-    public void notifyClients(String message, Long questionId) {
+    public synchronized void notifyClients(String message, Long questionId) {
         Iterator<Subscription> iterator = clients.iterator();
 
         System.out.println("[ANSWER_WATCHER] Notifying clients on " + questionId + "...");
-        synchronized (clients) {
             while (iterator.hasNext()) {
                 Subscription su = iterator.next();
                 try {
@@ -49,10 +48,9 @@ public class AnswerWatcher {
                         System.out.println("[ANSWER_WATCHER] Message sent.");
                         su.getSession().sendMessage(new TextMessage(message));
                     }
-                } catch (IOException e) {
+                } catch (IOException | IllegalStateException e) {
                     clients.remove(su);
                 }
-            }
         }
     }
 }

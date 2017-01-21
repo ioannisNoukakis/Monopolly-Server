@@ -4,6 +4,7 @@ import com.cristallium.api.AuthApi;
 
 import com.cristallium.api.dto.Token;
 import com.cristallium.api.dto.User;
+import com.cristallium.api.dto.Users;
 import io.swagger.annotations.*;
 
 import io.swagger.database.dao.UserRepository;
@@ -21,7 +22,8 @@ public class AuthApiController implements AuthApi {
     @Autowired
     UserRepository userRepository;
 
-    public ResponseEntity<Token> authPost(@ApiParam(value = "user to be connected" ,required=true ) @RequestBody User user) {
+    @Override
+    public ResponseEntity<Token> authPost(@ApiParam(value = "users to be connected" ,required=true ) @RequestBody User user) {
 
         io.swagger.database.model.User userDB = userRepository.findByUsername(user.getUsername());
         if(userDB == null) //dosen't exists
@@ -35,5 +37,4 @@ public class AuthApiController implements AuthApi {
         token.setUserId(userDB.getId());
         return new ResponseEntity<Token>(token, HttpStatus.OK);
     }
-
 }

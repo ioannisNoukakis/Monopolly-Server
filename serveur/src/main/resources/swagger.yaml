@@ -97,7 +97,7 @@ paths:
   /user/rooms:
     get:
       summary: Gets your rooms
-      description: retrives a list of your rooms.
+      description: retrives a list of your rooms and your subscribed one.
       produces:
         - application/json
       parameters:
@@ -313,7 +313,7 @@ paths:
           description: Forbidden.
         404:
           description: Not found.
-    
+
     get:
       summary: gets a question and its statistics
       description: gets a question and its statistics a question of this room. This method is public.
@@ -332,17 +332,17 @@ paths:
         404:
           description: Not found.
 
-  /answer:
+  /answer/{aId}:
     post:
       summary: Posts an answer .
       description: Posts an answer for a question. If this question is closed then it is not possible any longer.
       parameters:
-        - name: answer
-          in: body
-          description: The answer to be submitted.
+        - name: aId
+          in: path
+          description: the id of the answer
           required: true
-          schema:
-            $ref: '#/definitions/CompleteAsnwer'
+          type: integer
+          format: int64
         - name: token
           in: header
           description: token to be passed as a header
@@ -472,6 +472,7 @@ definitions:
       - body
       - answers
       - closed
+      - canAnswer
     properties:
       id:
         type: integer
@@ -483,6 +484,8 @@ definitions:
         items:
           $ref: '#/definitions/CompleteAsnwer'
       closed:
+        type: boolean
+      canAnswer:
         type: boolean
 
   asnwer:

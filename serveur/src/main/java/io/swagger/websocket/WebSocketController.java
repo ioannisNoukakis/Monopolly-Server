@@ -1,8 +1,7 @@
 package io.swagger.websocket;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import io.swagger.DataWatcher.AnswerWatcher;
-import io.swagger.DataWatcher.QuestionWatcher;
+import io.swagger.DataWatcher.DataWatcher;
 import io.swagger.database.dao.QuestionReporitory;
 import io.swagger.database.dao.RoomRepository;
 import io.swagger.database.dao.UserRepository;
@@ -43,6 +42,12 @@ public class WebSocketController extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
         System.out.println("[WS] New Connection");
+        if(message.getPayload().equals("hello"))
+        {
+            System.out.println("hello!");
+            session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
+            return;
+        }
         SubscriptionMessage subscriptionMessage = (SubscriptionMessage)JSONParser.parse(message.getPayload(), SubscriptionMessage.class);
 
         if(!clients.contains(session) && isClientAuth(subscriptionMessage.getToken())) {
@@ -58,9 +63,9 @@ public class WebSocketController extends TextWebSocketHandler {
         }
 
         if(subscriptionMessage.isSubscribe())
-            doSubscribe(session, subscriptionMessage.getEndpoint(), subscriptionMessage.getSubOjbectId());
+            doSubscribe(session, subscriptionMessage.getSubOjbectId());
         else
-            doUnSubscribe(session, subscriptionMessage.getEndpoint(), subscriptionMessage.getSubOjbectId());
+            doUnSubscribe(session, subscriptionMessage.getSubOjbectId());
     }
 
     private boolean isClientAuth(String token)
@@ -75,35 +80,14 @@ public class WebSocketController extends TextWebSocketHandler {
        return userRepository.findOne(id) != null;
     }
 
-    private void doSubscribe(WebSocketSession session, String endpoint, Long questionId) throws IOException {
-        switch (endpoint)
-        {
-            case "answersReply":
-                AnswerWatcher.getInstance().addClient(new Subscription(session, questionId));
-                session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
-                break;
-            case "questionPost":
-                QuestionWatcher.getInstance().addClient(new Subscription(session, questionId));
-                session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
-                break;
-            default:
-                session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(404))));
-        }
+    private void doSubscribe(WebSocketSession session, Long roomId) throws IOException {
+        DataWatcher.getInstance().addClient(new Subscription(session, roomId));
+        session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
+        System.out.println("SUCCESSFULLY SUSCRIBED TO " + roomId);
     }
 
-    private void doUnSubscribe(WebSocketSession session, String endpoint, Long roomId) throws IOException {
-        switch (endpoint)
-        {
-            case "answersReply":
-                AnswerWatcher.getInstance().removeClient(new Subscription(session, roomId));
-                session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
-                break;
-            case "questionPost":
-                QuestionWatcher.getInstance().removeClient(new Subscription(session, roomId));
-                session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
-                break;
-            default:
-                session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(404))));
-        }
+    private void doUnSubscribe(WebSocketSession session, Long roomId) throws IOException {
+        DataWatcher.getInstance().removeClient(new Subscription(session, roomId));
+        session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(200))));
     }
 }

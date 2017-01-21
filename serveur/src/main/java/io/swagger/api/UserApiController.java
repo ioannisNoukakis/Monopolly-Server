@@ -96,12 +96,12 @@ public class UserApiController implements UserApi {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         LinkedList<CompleteRoom> completeRooms = new LinkedList<>();
-        completeRooms = addToList(completeRooms, roomRepository.findByOwner(userRepository.findOne(id)));
-        completeRooms = addToList(completeRooms, userDB.getSubscribed());
+        completeRooms = addToList(completeRooms, userDB, roomRepository.findByOwner(userRepository.findOne(id)));
+        completeRooms = addToList(completeRooms, userDB, userDB.getSubscribed());
         return new ResponseEntity<>((List<CompleteRoom>)completeRooms, HttpStatus.OK);
     }
 
-    private LinkedList<CompleteRoom> addToList(LinkedList<CompleteRoom> completeRooms, List<io.swagger.database.model.CompleteRoom> b)
+    private LinkedList<CompleteRoom> addToList(LinkedList<CompleteRoom> completeRooms, io.swagger.database.model.User user, List<io.swagger.database.model.CompleteRoom> b)
     {
         for(io.swagger.database.model.CompleteRoom completeRoom : b)
         {
@@ -109,7 +109,7 @@ public class UserApiController implements UserApi {
             tmp.setId(completeRoom.getId());
             tmp.setOwner(completeRoom.getOwner().getId());
             tmp.setName(completeRoom.getName());
-            tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoom, false));
+            tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoom, user , false));
             completeRooms.push(tmp);
         }
         return completeRooms;

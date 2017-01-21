@@ -10,12 +10,22 @@ public class UserAnswer extends BaseReply {
     private Long userid;
     private String username;
     private CompleteAsnwer completeAnswer;
+    private Long questionId;
 
-    public UserAnswer(Long userid, String username, CompleteAsnwer completeAnswer) {
+    public UserAnswer(Long userid, String username, CompleteAsnwer completeAnswer, Long questionId) {
         super("UserAnswer");
         this.userid = userid;
         this.username = username;
         this.completeAnswer = completeAnswer;
+        this.questionId = questionId;
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 
     public UserAnswer() {

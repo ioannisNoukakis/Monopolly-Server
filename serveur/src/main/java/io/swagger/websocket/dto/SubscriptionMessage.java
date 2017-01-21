@@ -5,13 +5,11 @@ package io.swagger.websocket.dto;
  */
 public class SubscriptionMessage {
     private String token;
-    private String endpoint;
     private Long subOjbectId;
     private boolean subscribe;
 
     public SubscriptionMessage(String token, String endpoint, Long SubOjbectId, boolean subscribe) {
         this.token = token;
-        this.endpoint = endpoint;
         this.subOjbectId = SubOjbectId;
         this.subscribe = subscribe;
     }
@@ -33,14 +31,6 @@ public class SubscriptionMessage {
 
     public void setToken(String token) {
         this.token = token;
-    }
-
-    public String getEndpoint() {
-        return endpoint;
-    }
-
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
     }
 
     public boolean isSubscribe() {

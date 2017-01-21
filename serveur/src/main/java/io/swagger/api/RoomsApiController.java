@@ -3,7 +3,7 @@ package io.swagger.api;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.RoomsApi;
 import com.cristallium.api.dto.*;
-import io.swagger.DataWatcher.QuestionWatcher;
+import io.swagger.DataWatcher.DataWatcher;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.*;
 import io.swagger.database.model.*;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by lux on 14.01.17.
@@ -109,7 +108,7 @@ public class RoomsApiController implements RoomsApi {
             for(CompleteAnswer completeAnswer: completeQuestion.getAnswers())
             {
                 completeAnswer.setCompleteQuestion(null);
-                completeAnswer.setUser(new LinkedList<User>());
+                completeAnswer.setUsers(new LinkedList<User>());
                 answerRepository.delete(completeAnswer);
             }
             completeQuestion.setAnswers(new LinkedList<CompleteAnswer>());
@@ -141,7 +140,7 @@ public class RoomsApiController implements RoomsApi {
         tmp.setId(completeRoomDB.getId());
         tmp.setOwner(completeRoomDB.getOwner().getId());
         tmp.setName(completeRoomDB.getName());
-        tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoomDB, true));
+        tmp.setQuestions(Converter.questionsFromModelToDTO(completeRoomDB, null, true));
 
         return new ResponseEntity<>(tmp, HttpStatus.OK);
     }
@@ -220,8 +219,9 @@ public class RoomsApiController implements RoomsApi {
         questionDTO.setId(completeQuestion.getId());
         questionDTO.setAnswers(Converter.answersFromModelToDTO(completeQuestion, true));
         questionDTO.setClosed(completeQuestion.isClosed());
+        questionDTO.setCanAnswer(Converter.canAnswer(user,completeQuestion));
 
-        QuestionWatcher.getInstance().notifyClients(JSONParser.toJson(new QuestionReply(questionDTO)), completeQuestion.getId());
+        DataWatcher.getInstance().notifyClients(JSONParser.toJson(new QuestionReply(questionDTO)), completeQuestion.getCompleteRoom().getId());
 
         return new ResponseEntity<>(questionDTO, HttpStatus.CREATED);
     }
@@ -242,7 +242,7 @@ public class RoomsApiController implements RoomsApi {
         for(CompleteAnswer completeAnswer: completeQuestion.getAnswers())
         {
             completeAnswer.setCompleteQuestion(null);
-            completeAnswer.setUser(new LinkedList<User>());
+            completeAnswer.setUsers(new LinkedList<User>());
             answerRepository.delete(completeAnswer);
         }
         completeQuestion.setAnswers(new LinkedList<CompleteAnswer>());
