@@ -41,7 +41,7 @@ public class UserApiController implements UserApi {
      * @return
      */
     @Override
-    public ResponseEntity<Void> userDelete(@ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> userDelete(@ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         long id = -1;
         try{
             id = JWTutils.parseToken(token);
@@ -82,7 +82,7 @@ public class UserApiController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<List<CompleteRoom>> userRoomsGet(@ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<List<CompleteRoom>> userRoomsGet(@ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         long id;
         try{
             id = JWTutils.parseToken(token);

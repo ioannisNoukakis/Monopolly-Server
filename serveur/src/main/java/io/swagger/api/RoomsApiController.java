@@ -64,7 +64,7 @@ public class RoomsApiController implements RoomsApi {
      * @return
      */
     @Override
-    public ResponseEntity<Void> roomsPost(@ApiParam(value = "room to be created", required = true) @RequestBody Room room, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> roomsPost(@ApiParam(value = "room to be created", required = true) @RequestBody Room room, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
 
         User user = getUserDB(token);
         if(user==null)
@@ -90,7 +90,7 @@ public class RoomsApiController implements RoomsApi {
      * @return
      */
     @Override
-    public ResponseEntity<Void> roomsRoomIdDelete(@ApiParam(value = "room to be deleted", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> roomsRoomIdDelete(@ApiParam(value = "room to be deleted", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
 
         User user = getUserDB(token);
         if(user==null)
@@ -155,7 +155,7 @@ public class RoomsApiController implements RoomsApi {
      * @return
      */
     @Override
-    public ResponseEntity<Void> roomsRoomIdPatch(@ApiParam(value = "room to be modified", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "room to be patched", required = true) @RequestBody Room room, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> roomsRoomIdPatch(@ApiParam(value = "room to be modified", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "room to be patched", required = true) @RequestBody Room room, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
 
         User user = getUserDB(token);
         if(user==null)
@@ -179,7 +179,7 @@ public class RoomsApiController implements RoomsApi {
     }
 
     @Override
-    public ResponseEntity<com.cristallium.api.dto.CompleteQuestion> roomsRoomIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "Question to be added", required = true) @RequestBody Question question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<com.cristallium.api.dto.CompleteQuestion> roomsRoomIdPost(@ApiParam(value = "the room", required = true) @PathVariable("roomId") Long roomId, @ApiParam(value = "Question to be added", required = true) @RequestBody Question question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -227,7 +227,7 @@ public class RoomsApiController implements RoomsApi {
     }
 
     @Override
-    public ResponseEntity<Void> roomsQuestionQIdDelete(@ApiParam(value = "poll to be deleted", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> roomsQuestionQIdDelete(@ApiParam(value = "poll to be deleted", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -270,7 +270,7 @@ public class RoomsApiController implements RoomsApi {
 
 
     @Override
-    public ResponseEntity<Void> roomsQuestionQIdPatch(@ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> roomsQuestionQIdPatch(@ApiParam(value = "the question", required = true) @PathVariable("qId") Long qId, @ApiParam(value = "question to be patched", required = true) @RequestBody com.cristallium.api.dto.CompleteQuestion question, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
         User user = getUserDB(token);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
