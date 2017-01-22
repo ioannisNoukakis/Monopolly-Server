@@ -37,20 +37,22 @@ public class DataWatcher {
         clients.remove(subscription);
     }
 
-    public synchronized void notifyClients(String message, Long questionId) {
+    public synchronized void notifyClients(String message, Long roomId) {
         Iterator<Subscription> iterator = clients.iterator();
 
-        System.out.println("[ANSWER_WATCHER] Notifying clients on " + questionId + "...");
-            while (iterator.hasNext()) {
-                Subscription su = iterator.next();
-                try {
-                    if(su.getSubOjbectId() == questionId) {
-                        System.out.println("[ANSWER_WATCHER] Message sent.");
-                        su.getSession().sendMessage(new TextMessage(message));
-                    }
-                } catch (IOException | IllegalStateException e) {
-                    clients.remove(su);
+        System.out.println("[ANSWER_WATCHER] Notifying clients on " + roomId + "...");
+        for(int i = 0; i < clients.size(); i++) {
+            try {
+                if(clients.get(i).getSubOjbectId() == roomId) {
+
+                    clients.get(i).getSession().sendMessage(new TextMessage(message));
+                    System.out.println("[ANSWER_WATCHER] Message sent.");
                 }
+            } catch (IOException | IllegalStateException e) {
+                clients.remove(clients.get(i));
+                i--;
+                System.out.println("[ANSWER_WATCHER] removed client " + i);
+            }
         }
     }
 }

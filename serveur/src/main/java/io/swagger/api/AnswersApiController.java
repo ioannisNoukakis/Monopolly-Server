@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.cristallium.api.AnswerApi;
 import com.cristallium.api.dto.CompleteAsnwer;
 import com.cristallium.api.dto.CompleteQuestion;
+import com.cristallium.api.dto.StatisticalQuestion;
 import io.swagger.DataWatcher.DataWatcher;
 import io.swagger.annotations.ApiParam;
 import io.swagger.database.dao.AnswerRepository;
@@ -33,9 +34,9 @@ public class AnswersApiController implements AnswerApi {
     @Autowired
     UserRepository userRepository;
 
-    private void notifyUserForGivenAnswer(CompleteAsnwer completeAsnwer, User user, Long questionId, Long roomId)
+    private void notifyUserForGivenAnswer(StatisticalQuestion statisticalQuestion, Long roomId)
     {
-        DataWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(user.getId(), user.getUsername(), completeAsnwer,questionId)), roomId);
+        DataWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(statisticalQuestion)), roomId);
     }
 
     @Override
@@ -80,12 +81,13 @@ public class AnswersApiController implements AnswerApi {
         completeQuestion.setAnswers(Converter.answersFromModelToDTO(completeAnswerDB.getCompleteQuestion(), false));
         completeQuestion.setCanAnswer(false);
 
-        CompleteAsnwer completeAsnwer = new CompleteAsnwer();
-        completeAsnwer.setId(completeAnswerDB.getId());
-        completeAsnwer.setIsValid(completeAnswerDB.isValid());
-        completeAsnwer.setBody(completeAnswerDB.getBody());
+        StatisticalQuestion statisticalQuestion = new StatisticalQuestion();
+        statisticalQuestion.setId(completeQuestion.getId());
+        statisticalQuestion.setBody(completeQuestion.getBody());
+        statisticalQuestion.setClosed(completeQuestion.getClosed());
+        statisticalQuestion.setAnswers(Converter.statisticalAnswersFromModelToDTO(completeAnswerDB.getCompleteQuestion()));
 
-        notifyUserForGivenAnswer(completeAsnwer, userDB, completeAnswerDB.getCompleteQuestion().getId(), completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
+        notifyUserForGivenAnswer(statisticalQuestion, completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
     }
 }

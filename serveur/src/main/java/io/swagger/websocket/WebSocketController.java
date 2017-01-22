@@ -23,7 +23,6 @@ import java.util.List;
  * Created by lux on 16.01.17.
  */
 public class WebSocketController extends TextWebSocketHandler {
-    private List<WebSocketSession> clients;
 
     @Autowired
     UserRepository userRepository;
@@ -33,10 +32,6 @@ public class WebSocketController extends TextWebSocketHandler {
 
     @Autowired
     RoomRepository roomRepository;
-
-    public WebSocketController() {
-        clients = Collections.<WebSocketSession>synchronizedList(new LinkedList<WebSocketSession>());
-    }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -50,9 +45,7 @@ public class WebSocketController extends TextWebSocketHandler {
         }
         SubscriptionMessage subscriptionMessage = (SubscriptionMessage)JSONParser.parse(message.getPayload(), SubscriptionMessage.class);
 
-        if(!clients.contains(session) && isClientAuth(subscriptionMessage.getToken())) {
-            clients.add(session);
-        }else if(!isClientAuth(subscriptionMessage.getToken())){
+         if(!isClientAuth(subscriptionMessage.getToken())){
             session.sendMessage(new TextMessage(JSONParser.toJson(new WsResponse(403))));
             return;
         }

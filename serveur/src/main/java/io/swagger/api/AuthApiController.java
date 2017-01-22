@@ -4,7 +4,6 @@ import com.cristallium.api.AuthApi;
 
 import com.cristallium.api.dto.Token;
 import com.cristallium.api.dto.User;
-import com.cristallium.api.dto.Users;
 import io.swagger.annotations.*;
 
 import io.swagger.database.dao.UserRepository;
