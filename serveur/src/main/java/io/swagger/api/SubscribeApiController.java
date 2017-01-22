@@ -28,7 +28,7 @@ public class SubscribeApiController implements SubscribeApi {
     UserRepository userRepository;
 
     @Override
-    public ResponseEntity<Void> subscribeRoomNamePost(@ApiParam(value = "the room to join.", required = true) @PathVariable("roomName") String roomName, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
+    public synchronized ResponseEntity<Void> subscribeRoomNamePost(@ApiParam(value = "the room to join.", required = true) @PathVariable("roomName") String roomName, @ApiParam(value = "token to be passed as a header", required = true) @RequestHeader(value = "token", required = true) String token) {
 
         long id;
         try{

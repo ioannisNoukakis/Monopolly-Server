@@ -34,9 +34,9 @@ public class AnswersApiController implements AnswerApi {
     @Autowired
     UserRepository userRepository;
 
-    private void notifyUserForGivenAnswer(StatisticalQuestion statisticalQuestion, Long roomId)
+    private void notifyUserForGivenAnswer(String username, Long questionId, Long userAnswerId, Long roomId)
     {
-        DataWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(statisticalQuestion)), roomId);
+        DataWatcher.getInstance().notifyClients(JSONParser.toJson(new UserAnswer(username, questionId, userAnswerId)), roomId);
     }
 
     @Override
@@ -81,13 +81,9 @@ public class AnswersApiController implements AnswerApi {
         completeQuestion.setAnswers(Converter.answersFromModelToDTO(completeAnswerDB.getCompleteQuestion(), false));
         completeQuestion.setCanAnswer(false);
 
-        StatisticalQuestion statisticalQuestion = new StatisticalQuestion();
-        statisticalQuestion.setId(completeQuestion.getId());
-        statisticalQuestion.setBody(completeQuestion.getBody());
-        statisticalQuestion.setClosed(completeQuestion.getClosed());
-        statisticalQuestion.setAnswers(Converter.statisticalAnswersFromModelToDTO(completeAnswerDB.getCompleteQuestion()));
 
-        notifyUserForGivenAnswer(statisticalQuestion, completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
+
+        notifyUserForGivenAnswer(userDB.getUsername(), completeAnswerDB.getCompleteQuestion().getId(), completeAnswerDB.getId(), completeAnswerDB.getCompleteQuestion().getCompleteRoom().getId());
         return new ResponseEntity<>(completeQuestion, HttpStatus.OK);
     }
 }
