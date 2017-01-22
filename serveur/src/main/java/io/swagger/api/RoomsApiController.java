@@ -217,7 +217,7 @@ public class RoomsApiController implements RoomsApi {
         com.cristallium.api.dto.CompleteQuestion questionDTO = new com.cristallium.api.dto.CompleteQuestion();
         questionDTO.setBody(completeQuestion.getBody());
         questionDTO.setId(completeQuestion.getId());
-        questionDTO.setAnswers(Converter.answersFromModelToDTO(completeQuestion, true));
+        questionDTO.setAnswers(Converter.answersFromModelToDTO(completeQuestion, false));
         questionDTO.setClosed(completeQuestion.isClosed());
         questionDTO.setCanAnswer(Converter.canAnswer(user,completeQuestion));
 
