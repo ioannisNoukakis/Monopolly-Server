@@ -29,7 +29,8 @@ public class DataWatcher {
 
     public void addClient(Subscription subscription)
     {
-        clients.add(subscription);
+        if (!clients.contains(subscription))
+            clients.add(subscription);
     }
 
     public void removeClient(Subscription subscription)
